@@ -1,0 +1,20 @@
+name = "hekaya-hob"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# بدون id: كلودفلير بتنشئهم تلقائيًا أول نشر (wrangler 4.45+)
+[[kv_namespaces]]
+binding = "GIFTS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hekaya"
+
+[vars]
+WA_PHONE = "201040682654"
+PAYMOB_INTEGRATION_ID = ""
+PAYMOB_IFRAME_ID = ""

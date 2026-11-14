@@ -1,0 +1,45 @@
+CREATE TABLE IF NOT EXISTS users(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  pw_hash TEXT NOT NULL,
+  pw_salt TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user',
+  created_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sessions(
+  token_hash TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS gifts(
+  id TEXT PRIMARY KEY,
+  user_id INTEGER,
+  views INTEGER NOT NULL DEFAULT 0,
+  created_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS products(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  price INTEGER NOT NULL,
+  image TEXT NOT NULL DEFAULT '',
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS orders(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  address TEXT NOT NULL DEFAULT '',
+  items TEXT NOT NULL,
+  total INTEGER NOT NULL,
+  method TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'new',
+  pay_ref TEXT,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_gifts_user ON gifts(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);

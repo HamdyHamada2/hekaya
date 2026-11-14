@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>هدية لك</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#d63a62,#5b1a3a);color:#fff;font:500 19px/1.9 Tahoma,sans-serif;text-align:center}
+.c{max-width:520px;width:100%}
+h1{font:700 30px Georgia,serif;margin:0 0 12px}
+img{max-width:100%;border-radius:20px;margin:14px 0}
+input,button{font:inherit;padding:12px 20px;border-radius:999px;border:0;margin:6px;max-width:100%}
+button{background:#fff;color:#222;font-weight:700;cursor:pointer}
+audio{width:100%;margin:10px 0}
+#mu{position:fixed;top:12px;left:12px;z-index:2}
+#m{white-space:pre-wrap}
+#e{color:#ffd6dd;min-height:1.8em}
+.h{position:fixed;bottom:-30px;animation:u linear infinite;opacity:.4;pointer-events:none}
+@keyframes u{to{transform:translateY(-110vh)}}
+@media(prefers-reduced-motion:reduce){.h{display:none}}
+</style>
+</head>
+<body>
+<button id="mu" hidden aria-label="موسيقى">🎵</button>
+<div class="c">
+  <div id="ld"><h1>💌</h1><p>جاري تحميل هديتك…</p></div>
+  <div id="nf" hidden><h1>الهدية مش موجودة</h1><p>الرابط غلط أو الهدية انتهت مدتها.</p></div>
+  <div id="cd" hidden><h1>⏳ الهدية لسه مقفولة</h1><p>بتتفتح يوم <span id="cl"></span></p><p id="ct" role="timer"></p></div>
+  <div id="g" hidden><h1>🔒 هدية خاصة</h1><p>اكتب كلمة السر اللي وصلتلك</p><input id="p" type="password" autocomplete="off"><br><button id="b">افتح</button><p id="e" role="status"></p></div>
+  <div id="r" hidden><h1 id="t"></h1><img id="i" hidden alt=""><audio id="v" controls hidden></audio><div id="m"></div></div>
+</div>
+<script>
+var $=function(i){return document.getElementById(i)},D=null,busy=false;
+var id=location.pathname.split("/").pop();
+function ub(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+async function dec(p){
+  var u=ub(D.E),km=await crypto.subtle.importKey("raw",new TextEncoder().encode(p),"PBKDF2",false,["deriveKey"]);
+  var k=await crypto.subtle.deriveKey({name:"PBKDF2",salt:u.slice(0,16),iterations:150000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["decrypt"]);
+  var pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:u.slice(16,28)},k,u.slice(28));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+function show(d){
+  $("g").hidden=true;$("r").hidden=false;$("t").textContent=d.title;
+  if(d.photo&&/^data:image\//.test(d.photo)){$("i").src=d.photo;$("i").hidden=false}
+  if(d.voice&&/^data:audio\//.test(d.voice)){$("v").src=d.voice;$("v").hidden=false}
+  if(d.music&&/^data:audio\//.test(d.music)){
+    var au=new Audio(d.music),mu=$("mu");au.loop=true;mu.hidden=false;
+    mu.onclick=function(){if(au.paused){au.play();mu.textContent="⏸"}else{au.pause();mu.textContent="🎵"}};
+    au.play().then(function(){mu.textContent="⏸"}).catch(function(){});
+  }
+  var k=0,m=$("m"),iv=setInterval(function(){k+=2;m.textContent=d.msg.slice(0,k);if(k>=d.msg.length)clearInterval(iv)},40);
+  for(var j=0;j<12;j++){var s=document.createElement("span");s.className="h";s.textContent="♥";s.style.left=Math.random()*100+"%";s.style.fontSize=14+Math.random()*20+"px";s.style.animationDuration=8+Math.random()*8+"s";s.style.animationDelay=-Math.random()*10+"s";document.body.appendChild(s)}
+}
+function ask(){$("cd").hidden=true;$("g").hidden=false;$("p").focus()}
+async function open(){
+  if(busy)return;var p=$("p").value.trim();if(!p)return;busy=true;$("e").textContent="";
+  try{show(await dec(p))}catch(e){$("e").textContent="كلمة السر غير صحيحة"}
+  busy=false;
+}
+$("b").onclick=open;$("p").onkeydown=function(e){if(e.key==="Enter")open()};
+(async function(){
+  try{
+    var r=await fetch("/api/gifts/"+encodeURIComponent(id));
+    $("ld").hidden=true;
+    if(!r.ok){$("nf").hidden=false;return}
+    D=await r.json();
+    if(/^#[0-9a-f]{6}$/i.test(D.a)&&/^#[0-9a-f]{6}$/i.test(D.b))document.body.style.background="linear-gradient(135deg,"+D.a+","+D.b+")";
+    if(D.U&&Date.now()<D.U){
+      $("cd").hidden=false;$("cl").textContent=new Date(D.U).toLocaleString("ar-EG",{dateStyle:"full",timeStyle:"short"});
+      var iv;function tick(){var s=Math.floor((D.U-Date.now())/1000);if(s<=0){clearInterval(iv);ask();return}$("ct").textContent=Math.floor(s/86400)+" يوم "+Math.floor(s%86400/3600)+" ساعة "+Math.floor(s%3600/60)+" دقيقة "+(s%60)+" ثانية"}
+      tick();iv=setInterval(tick,1000);
+    }else ask();
+  }catch(e){$("ld").hidden=true;$("nf").hidden=false}
+})();
+</script>
+</body>
+</html>

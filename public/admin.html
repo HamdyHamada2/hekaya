@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Tajawal:wght@400;500;700&display=swap"><link rel="stylesheet" href="/site.css"><title>الإدارة | حكاية حب</title></head><body>
+<div id="hdr"></div>
+<main class="w">
+<div id="gate" class="card" hidden>الصفحة دي للإدارة فقط. <a href="/account">سجّل دخول</a> بحساب المدير.</div>
+<div id="dash" hidden>
+  <h1>لوحة الإدارة</h1>
+  <div class="stats" id="stats"></div>
+  <h2 style="margin-top:24px">الطلبات</h2><div id="orders" class="mu">جاري التحميل…</div>
+  <h2 style="margin-top:24px">المنتجات</h2>
+  <form id="pf" class="card">
+    <label>اسم المنتج<input id="p_n" maxlength="80" required></label>
+    <label>الوصف<textarea id="p_d" rows="2" maxlength="500"></textarea></label>
+    <label>السعر بالجنيه (رقم صحيح)<input id="p_p" type="number" min="1" step="1" required></label>
+    <label>الصورة<input id="p_i" type="file" accept="image/*"></label>
+    <label class="row"><input id="p_a" type="checkbox" checked> ظاهر في المتجر</label>
+    <div class="row"><button class="btn" id="p_s" type="submit">حفظ المنتج</button><button class="btn o" id="p_c" type="button" hidden>إلغاء التعديل</button></div>
+    <div class="err" id="p_e" role="status"></div>
+  </form>
+  <div id="prods"></div>
+</div>
+</main>
+<script src="/app.js"></script>
+<script>
+const SL={new:"جديد",paid:"مدفوع",preparing:"جاري التجهيز",shipped:"خرج للتوصيل",done:"تم التسليم",cancelled:"ملغي"};
+let editing=null,img="";
+function resetForm(){editing=null;img="";$("#pf").reset();$("#p_a").checked=true;$("#p_c").hidden=true;$("#p_e").textContent=""}
+$("#p_c").onclick=resetForm;
+$("#p_i").onchange=function(){const f=this.files[0];if(!f)return;compressImage(f,500,d=>{img=d;$("#p_e").textContent="تم تجهيز الصورة ✓"},()=>{$("#p_e").textContent="الصورة غير مدعومة"})};
+$("#pf").onsubmit=async e=>{
+  e.preventDefault();$("#p_e").textContent="";
+  const body={name:$("#p_n").value,description:$("#p_d").value,price:parseInt($("#p_p").value,10),image:img,active:$("#p_a").checked?1:0};
+  try{if(editing)await api("/admin/products/"+editing,"PUT",body);else await api("/admin/products","POST",body);resetForm();loadProds()}
+  catch(er){$("#p_e").textContent=er.message==="bad_input"?"راجع الاسم والسعر (رقم صحيح) وحجم الصورة":msg(er.message)}
+};
+async function loadStats(){try{const s=await api("/admin/stats");const st=$("#stats");st.textContent="";
+  [["مستخدمين",s.users],["هدايا",s.gifts],["طلبات",s.orders],["إيرادات (ج.م)",s.revenue]].forEach(([l,v])=>st.append(h("div",{},h("b",{},String(v)),l)))}catch(e){}}
+async function loadOrders(){
+  const box=$("#orders");
+  try{const os=await api("/admin/orders");box.textContent="";
+    if(!os.length)box.textContent="مفيش طلبات.";
+    os.forEach(o=>{const sel=h("select",{onchange:async()=>{try{await api("/admin/orders/"+o.id,"PUT",{status:sel.value});loadStats()}catch(e){alert(msg(e.message))}}},
+        Object.entries(SL).map(([k,v])=>{const op=h("option",{value:k},v);if(k===o.status)op.selected=true;return op}));
+      box.append(h("div",{class:"card"},h("b",{},"#"+o.id+" — "+o.name+" — "+o.total+" ج.م ("+(o.method==="online"?"أونلاين":"عند الاستلام")+")"),
+        h("div",{dir:"ltr",class:"mu"},o.phone),h("div",{class:"mu"},o.address||"—"),h("div",{},o.items.map(i=>i.name+" ×"+i.qty).join("، ")),h("div",{class:"mu"},date(o.created_at)),sel))});
+  }catch(e){box.textContent=msg(e.message)}
+}
+async function loadProds(){
+  const box=$("#prods");
+  try{const ps=await api("/admin/products");box.textContent="";
+    ps.forEach(p=>box.append(h("div",{class:"card row"},p.image?h("img",{src:p.image,alt:"",style:"width:56px;height:56px;border-radius:10px;object-fit:cover"}):null,
+      h("b",{},p.name),h("span",{class:"mu"},p.price+" ج.م"+(p.active?"":" (مخفي)")),
+      h("button",{class:"btn o",type:"button",onclick:()=>{editing=p.id;img=p.image;$("#p_n").value=p.name;$("#p_d").value=p.description;$("#p_p").value=p.price;$("#p_a").checked=!!p.active;$("#p_c").hidden=false;window.scrollTo({top:$("#pf").offsetTop-80,behavior:"smooth"})}},"تعديل"),
+      h("button",{class:"btn o",type:"button",onclick:async()=>{if(!confirm("حذف المنتج؟"))return;try{await api("/admin/products/"+p.id,"DELETE");loadProds()}catch(e){alert(msg(e.message))}}},"حذف"))));
+  }catch(e){box.textContent=msg(e.message)}
+}
+(async()=>{
+  const u=await mountHeader();
+  if(!u||u.role!=="admin"){$("#gate").hidden=false;return}
+  $("#dash").hidden=false;loadStats();loadOrders();loadProds();
+})();
+</script></body></html>

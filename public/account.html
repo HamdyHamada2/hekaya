@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Tajawal:wght@400;500;700&display=swap"><link rel="stylesheet" href="/site.css"><title>حسابي | حكاية حب</title></head><body>
+<div id="hdr"></div>
+<main class="w">
+<div id="auth" hidden>
+  <div class="tabs"><button class="btn" id="t_in" type="button">دخول</button><button class="btn o" id="t_up" type="button">حساب جديد</button></div>
+  <form id="f_in"><label>الإيميل<input id="i_e" type="email" dir="ltr" required autocomplete="email"></label>
+    <label>كلمة السر<input id="i_p" type="password" required autocomplete="current-password"></label>
+    <button class="btn" type="submit">دخول</button><div class="err" id="i_err" role="status"></div></form>
+  <form id="f_up" hidden><label>الاسم<input id="u_n" maxlength="60" required autocomplete="name"></label>
+    <label>الإيميل<input id="u_e" type="email" dir="ltr" required autocomplete="email"></label>
+    <label>كلمة السر (8 حروف على الأقل)<input id="u_p" type="password" minlength="8" required autocomplete="new-password"></label>
+    <details><summary class="mu">كود الإدارة (للمالك فقط)</summary><label><input id="u_s" type="password" autocomplete="off"></label></details>
+    <button class="btn" type="submit">إنشاء الحساب</button><div class="err" id="u_err" role="status"></div></form>
+</div>
+<div id="panel" hidden>
+  <h1 id="hello"></h1>
+  <div class="row"><a class="btn o" href="/#build">اصنع هدية جديدة</a><button class="btn o" id="out" type="button">تسجيل خروج</button></div>
+  <h2 style="margin-top:24px">هداياي</h2><div id="gifts" class="mu">جاري التحميل…</div>
+  <h2 style="margin-top:24px">طلباتي</h2><div id="orders" class="mu">جاري التحميل…</div>
+</div>
+</main>
+<script src="/app.js"></script>
+<script>
+const SL={new:"جديد",paid:"مدفوع",preparing:"جاري التجهيز",shipped:"خرج للتوصيل",done:"تم التسليم",cancelled:"ملغي"};
+function tab(up){$("#f_in").hidden=up;$("#f_up").hidden=!up;$("#t_in").className=up?"btn o":"btn";$("#t_up").className=up?"btn":"btn o"}
+$("#t_in").onclick=()=>tab(false);$("#t_up").onclick=()=>tab(true);
+$("#f_in").onsubmit=async e=>{e.preventDefault();$("#i_err").textContent="";try{await api("/auth/login","POST",{email:$("#i_e").value,password:$("#i_p").value});location.reload()}catch(er){$("#i_err").textContent=msg(er.message)}};
+$("#f_up").onsubmit=async e=>{e.preventDefault();$("#u_err").textContent="";try{await api("/auth/register","POST",{name:$("#u_n").value,email:$("#u_e").value,password:$("#u_p").value,setup:$("#u_s").value});location.reload()}catch(er){$("#u_err").textContent=msg(er.message)}};
+$("#out").onclick=async()=>{try{await api("/auth/logout","POST")}catch(e){}location.reload()};
+async function loadGifts(){
+  const box=$("#gifts");
+  try{const r=await api("/my/gifts");box.textContent="";
+    if(!r.gifts.length)box.textContent="لسه معملتش روابط هدايا. اعمل هدية من الصفحة الرئيسية واضغط «أنشئ رابط».";
+    r.gifts.forEach(g=>{const link=location.origin+"/g/"+g.id;
+      box.append(h("div",{class:"card row"},h("a",{href:link,target:"_blank",rel:"noopener",dir:"ltr"},"/g/"+g.id.slice(0,6)+"…"),h("span",{class:"mu"},date(g.created_at)+" · "+g.views+" مشاهدة"),
+        h("button",{class:"btn o",type:"button",onclick:function(){try{navigator.clipboard.writeText(link);this.textContent="تم النسخ ✓"}catch(e){}}},"نسخ الرابط"),
+        h("button",{class:"btn o",type:"button",onclick:async()=>{if(!confirm("حذف الهدية نهائيًا؟"))return;try{await api("/my/gifts/"+g.id,"DELETE");loadGifts()}catch(e){alert(msg(e.message))}}},"حذف")))});
+  }catch(e){box.textContent=msg(e.message)}
+}
+async function loadOrders(){
+  const box=$("#orders");
+  try{const r=await api("/my/orders");box.textContent="";
+    if(!r.orders.length)box.textContent="مفيش طلبات لسه.";
+    r.orders.forEach(o=>box.append(h("div",{class:"card"},h("b",{},"طلب #"+o.id+" — "+o.total+" ج.م"),h("div",{class:"mu"},date(o.created_at)+" · "+(SL[o.status]||o.status)),h("div",{},o.items.map(i=>i.name+" ×"+i.qty).join("، ")))));
+  }catch(e){box.textContent=msg(e.message)}
+}
+(async()=>{
+  const u=await mountHeader();
+  if(!u){$("#auth").hidden=false;return}
+  $("#panel").hidden=false;$("#hello").textContent="أهلًا "+u.name+" 👋";
+  loadGifts();loadOrders();
+})();
+</script></body></html>

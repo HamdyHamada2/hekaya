@@ -34,3 +34,4 @@ input[type=radio],input[type=checkbox]{width:auto}
 .stats div{background:var(--bg2);border:1.5px solid var(--ln);border-radius:16px;padding:12px;text-align:center}
 .stats b{display:block;font-size:26px;color:var(--rose)}
 hr{border:0;border-top:1.5px solid var(--ln);margin:20px 0}
+[hidden]{display:none!important}

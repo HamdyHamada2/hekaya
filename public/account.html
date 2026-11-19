@@ -6,6 +6,9 @@
   <form id="f_in"><label>الإيميل<input id="i_e" type="email" dir="ltr" required autocomplete="email"></label>
     <label>كلمة السر<input id="i_p" type="password" required autocomplete="current-password"></label>
     <button class="btn" type="submit">دخول</button><div class="err" id="i_err" role="status"></div></form>
+  <p><a href="#" id="fg_link" hidden>نسيت كلمة السر؟</a></p>
+  <form id="f_fg" hidden><label>اكتب إيميلك وهنبعتلك رابط لاختيار كلمة سر جديدة<input id="fg_e" type="email" dir="ltr" required autocomplete="email"></label>
+    <button class="btn" type="submit">إرسال الرابط</button><div class="err" id="fg_msg" role="status"></div></form>
   <form id="f_up" hidden><label>الاسم<input id="u_n" maxlength="60" required autocomplete="name"></label>
     <label>الإيميل<input id="u_e" type="email" dir="ltr" required autocomplete="email"></label>
     <label>كلمة السر (8 حروف على الأقل)<input id="u_p" type="password" minlength="8" required autocomplete="new-password"></label>
@@ -22,7 +25,7 @@
 <script src="/app.js"></script>
 <script>
 const SL={new:"جديد",paid:"مدفوع",preparing:"جاري التجهيز",shipped:"خرج للتوصيل",done:"تم التسليم",cancelled:"ملغي"};
-function tab(up){$("#f_in").hidden=up;$("#f_up").hidden=!up;$("#t_in").className=up?"btn o":"btn";$("#t_up").className=up?"btn":"btn o"}
+function tab(up){$("#f_fg").hidden=true;$("#f_in").hidden=up;$("#f_up").hidden=!up;$("#t_in").className=up?"btn o":"btn";$("#t_up").className=up?"btn":"btn o"}
 $("#t_in").onclick=()=>tab(false);$("#t_up").onclick=()=>tab(true);
 $("#f_in").onsubmit=async e=>{e.preventDefault();$("#i_err").textContent="";try{await api("/auth/login","POST",{email:$("#i_e").value,password:$("#i_p").value});location.reload()}catch(er){$("#i_err").textContent=msg(er.message)}};
 $("#f_up").onsubmit=async e=>{e.preventDefault();$("#u_err").textContent="";try{await api("/auth/register","POST",{name:$("#u_n").value,email:$("#u_e").value,password:$("#u_p").value,setup:$("#u_s").value});location.reload()}catch(er){$("#u_err").textContent=msg(er.message)}};
@@ -44,6 +47,11 @@ async function loadOrders(){
     r.orders.forEach(o=>box.append(h("div",{class:"card"},h("b",{},"طلب #"+o.id+" — "+o.total+" ج.م"),h("div",{class:"mu"},date(o.created_at)+" · "+(SL[o.status]||o.status)),h("div",{},o.items.map(i=>i.name+" ×"+i.qty).join("، ")))));
   }catch(e){box.textContent=msg(e.message)}
 }
+api("/config").then(c=>{if(c.mail)$("#fg_link").hidden=false}).catch(()=>{});
+$("#fg_link").onclick=e=>{e.preventDefault();$("#f_in").hidden=true;$("#f_fg").hidden=false};
+$("#f_fg").onsubmit=async e=>{e.preventDefault();$("#fg_msg").className="err";$("#fg_msg").textContent="";
+  try{await api("/auth/forgot","POST",{email:$("#fg_e").value});$("#fg_msg").className="ok";$("#fg_msg").textContent="لو الإيميل ده مسجّل عندنا، هيوصلك رابط خلال دقايق. راجع صندوق الـ Spam كمان."}
+  catch(er){$("#fg_msg").textContent=msg(er.message)}};
 (async()=>{
   const u=await mountHeader();
   if(!u){$("#auth").hidden=false;return}

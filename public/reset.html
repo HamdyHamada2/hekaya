@@ -1,0 +1,17 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Tajawal:wght@400;500;700&display=swap"><link rel="stylesheet" href="/site.css"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex"><title>كلمة سر جديدة | حكاية حب</title></head><body>
+<div id="hdr"></div>
+<main class="w">
+<h1>اختيار كلمة سر جديدة</h1>
+<form id="f"><label>كلمة السر الجديدة (8 حروف على الأقل)<input id="pw" type="password" minlength="8" required autocomplete="new-password"></label>
+<button class="btn" type="submit">حفظ</button><div class="err" id="msg" role="status"></div></form>
+<p id="done" class="ok" hidden>تم تغيير كلمة السر ✅ <a href="/account">سجّل دخول</a></p>
+</main>
+<script src="/app.js"></script>
+<script>
+mountHeader();
+const token=new URLSearchParams(location.search).get("token")||"";
+if(!token){$("#f").hidden=true;$("#msg").textContent="الرابط ناقص. اطلب رابط جديد من صفحة الدخول."}
+$("#f").onsubmit=async e=>{e.preventDefault();$("#msg").textContent="";
+  try{await api("/auth/reset","POST",{token,password:$("#pw").value});history.replaceState(null,"","/reset");$("#f").hidden=true;$("#done").hidden=false}
+  catch(er){$("#msg").textContent=msg(er.message)}};
+</script></body></html>

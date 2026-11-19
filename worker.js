@@ -74,6 +74,17 @@ async function verifyWebhook(env, obj, hmac) {
   return safeEq(sig, String(hmac).toLowerCase());
 }
 
+// ===== mail (Resend) =====
+const mailReady = (env) => !!(env.RESEND_API_KEY && env.MAIL_FROM);
+async function sendMail(env, { to, subject, html }) {
+  const r = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: "Bearer " + env.RESEND_API_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: env.MAIL_FROM, to: [to], subject, html }),
+  });
+  if (!r.ok) throw new Error("mail_" + r.status);
+}
+
 // ===== worker =====
 
 const COOKIE = "hk_sid";
@@ -181,13 +192,13 @@ async function route(req, env, ctx) {
   const user = await currentUser(req, env);
   let x;
 
-  if (p === "/api/config" && m === "GET") return J({ online: paymobReady(env), wa: env.WA_PHONE || "" });
+  if (p === "/api/config" && m === "GET") return J({ online: paymobReady(env), wa: env.WA_PHONE || "", mail: mailReady(env) });
   if (p === "/api/health" && m === "GET") {
     const tables = {};
-    for (const t of ["users", "sessions", "gifts", "products", "orders"]) {
+    for (const t of ["users", "sessions", "gifts", "products", "orders", "email_tokens"]) {
       try { await env.DB.prepare("SELECT 1 FROM " + t + " LIMIT 1").first(); tables[t] = true; } catch { tables[t] = false; }
     }
-    return J({ kv: !!env.GIFTS, tables });
+    return J({ kv: !!env.GIFTS, tables, mail: mailReady(env), payments: paymobReady(env) });
   }
   if (p === "/api/me" && m === "GET") return J({ user: user ? pub(user) : null });
 
@@ -227,6 +238,43 @@ async function route(req, env, ctx) {
   if (p === "/api/auth/logout" && m === "POST") {
     const t = getCookie(req, COOKIE);
     if (t) await env.DB.prepare("DELETE FROM sessions WHERE token_hash=?").bind(await sha256hex(t)).run();
+    return J({ ok: true }, 200, { "Set-Cookie": cookie("", 0) });
+  }
+
+  if (p === "/api/auth/forgot" && m === "POST") {
+    await limit(env, "forgot:" + ip(req), 5, 3600);
+    const b = await readBody(req);
+    const email = typeof b.email === "string" ? b.email.trim().toLowerCase() : "";
+    if (mailReady(env) && EMAIL.test(email)) {
+      const u = await env.DB.prepare("SELECT id FROM users WHERE email=?").bind(email).first();
+      if (u) {
+        const token = randToken();
+        await env.DB.prepare("DELETE FROM email_tokens WHERE user_id=? AND kind='reset'").bind(u.id).run();
+        await env.DB.prepare("INSERT INTO email_tokens(token_hash,user_id,kind,expires_at) VALUES(?,?,?,?)")
+          .bind(await sha256hex(token), u.id, "reset", Date.now() + 3600_000).run();
+        const link = (env.SITE_URL || new URL(req.url).origin).replace(/\/+$/, "") + "/reset?token=" + token;
+        const html = '<div dir="rtl" style="font-family:Tahoma,sans-serif;line-height:1.9">' +
+          "<h2>استرجاع كلمة السر</h2><p>طلبت استرجاع كلمة السر لحسابك في حكاية حب. اضغط الزر التالي لاختيار كلمة سر جديدة (الرابط صالح ساعة واحدة):</p>" +
+          '<p><a href="' + link + '" style="background:#d63a62;color:#fff;padding:10px 22px;border-radius:999px;text-decoration:none">اختيار كلمة سر جديدة</a></p>' +
+          "<p>لو ماطلبتش ده، تجاهل الرسالة وحسابك آمن.</p></div>";
+        ctx.waitUntil(sendMail(env, { to: email, subject: "استرجاع كلمة السر - حكاية حب", html }).catch((e) => console.error(e)));
+      }
+    }
+    return J({ ok: true });
+  }
+  if (p === "/api/auth/reset" && m === "POST") {
+    await limit(env, "reset:" + ip(req), 10, 3600);
+    const b = await readBody(req);
+    const pw = typeof b.password === "string" ? b.password : "";
+    if (typeof b.token !== "string" || !/^[A-Za-z0-9_-]{20,80}$/.test(b.token)) return E("bad_token");
+    if (pw.length < 8 || pw.length > 128) return E("weak_password");
+    const th = await sha256hex(b.token);
+    const t = await env.DB.prepare("SELECT user_id,expires_at FROM email_tokens WHERE token_hash=? AND kind='reset'").bind(th).first();
+    if (!t || t.expires_at < Date.now()) return E("bad_token");
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    await env.DB.prepare("UPDATE users SET pw_hash=?,pw_salt=? WHERE id=?").bind(await hashPw(pw, salt), b64(salt), t.user_id).run();
+    await env.DB.prepare("DELETE FROM email_tokens WHERE token_hash=?").bind(th).run();
+    await env.DB.prepare("DELETE FROM sessions WHERE user_id=?").bind(t.user_id).run();
     return J({ ok: true }, 200, { "Set-Cookie": cookie("", 0) });
   }
 

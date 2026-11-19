@@ -18,3 +18,7 @@ database_name = "hekaya"
 WA_PHONE = "201040682654"
 PAYMOB_INTEGRATION_ID = ""
 PAYMOB_IFRAME_ID = ""
+# الإيميل (Resend): ضع عنوان المرسل بعد توثيق الدومين، مثال: حكاية حب <hello@yourdomain.com>
+MAIL_FROM = ""
+# رابط موقعك النهائي بدون / في الآخر، مثال: https://yourdomain.com
+SITE_URL = ""

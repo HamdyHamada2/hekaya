@@ -43,3 +43,9 @@ CREATE TABLE IF NOT EXISTS orders(
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_gifts_user ON gifts(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
+CREATE TABLE IF NOT EXISTS email_tokens(
+  token_hash TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  kind TEXT NOT NULL,
+  expires_at INTEGER NOT NULL
+);

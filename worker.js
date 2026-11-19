@@ -167,14 +167,79 @@ function productInput(b) {
   return { name, description, price, image, active };
 }
 
+
+// ===== features: coupons / wheel / quiz / wallet =====
+const WALLETS = ["vodafone", "orange", "etisalat", "we", "instapay", "other"];
+const PRIZES = [
+  { label: "خصم 5%", kind: "percent", value: 5, w: 30 },
+  { label: "حظ أوفر", w: 20 },
+  { label: "خصم 10%", kind: "percent", value: 10, w: 25 },
+  { label: "خصم 15%", kind: "percent", value: 15, w: 10 },
+  { label: "خصم 20 جنيه", kind: "fixed", value: 20, w: 12 },
+  { label: "خصم 20%", kind: "percent", value: 20, w: 3 },
+];
+const CODE_RE = /^[A-Z0-9_-]{3,24}$/;
+const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const randInt = (n) => crypto.getRandomValues(new Uint32Array(1))[0] % n;
+
+async function priceItems(env, items) {
+  if (!Array.isArray(items) || items.length < 1 || items.length > 20) throw E("bad_items");
+  const lines = []; let total = 0;
+  for (const it of items) {
+    const id = it && it.id, qty = it && it.qty;
+    if (!Number.isInteger(id) || !Number.isInteger(qty) || qty < 1 || qty > 20) throw E("bad_items");
+    const pr = await env.DB.prepare("SELECT id,name,price FROM products WHERE id=? AND active=1").bind(id).first();
+    if (!pr) throw E("bad_items");
+    lines.push({ id: pr.id, name: pr.name, price: pr.price, qty });
+    total += pr.price * qty;
+  }
+  return { lines, total };
+}
+
+async function priceWithCoupon(env, user, rawCode, subtotal) {
+  if (rawCode === undefined || rawCode === null || rawCode === "") return { discount: 0, code: null };
+  const code = String(rawCode).trim().toUpperCase();
+  if (!CODE_RE.test(code)) throw E("coupon_invalid");
+  const c = await env.DB.prepare("SELECT * FROM coupons WHERE code=?").bind(code).first();
+  if (!c || !c.active) throw E("coupon_invalid");
+  if (c.expires_at && c.expires_at < Date.now()) throw E("coupon_expired");
+  if (c.max_uses && c.used >= c.max_uses) throw E("coupon_used");
+  if (c.owner && (!user || user.id !== c.owner)) throw E("coupon_owner");
+  if (subtotal < c.min_total) throw E("coupon_min");
+  if (c.first_order_only) {
+    if (!user) throw E("coupon_login");
+    const n = (await env.DB.prepare("SELECT COUNT(*) n FROM orders WHERE user_id=? AND status!='cancelled'").bind(user.id).first()).n;
+    if (n > 0) throw E("coupon_first");
+  }
+  let discount = c.kind === "percent" ? Math.floor((subtotal * c.value) / 100) : c.value;
+  discount = Math.max(0, Math.min(discount, subtotal - 1));
+  return { discount, code };
+}
+
+function cleanQuiz(b) {
+  const title = str(b.title, 2, 80), name = str(b.name, 2, 40);
+  if (!title || !name || !Array.isArray(b.questions) || b.questions.length < 1 || b.questions.length > 10) return null;
+  const questions = [];
+  for (const q of b.questions) {
+    const text = str(q && q.q, 2, 120), opts = q && q.options;
+    if (!text || !Array.isArray(opts) || opts.length < 2 || opts.length > 4) return null;
+    const options = opts.map((x) => str(x, 1, 60));
+    if (options.some((x) => !x)) return null;
+    if (!Number.isInteger(q.a) || q.a < 0 || q.a >= options.length) return null;
+    questions.push({ q: text, options, a: q.a });
+  }
+  return { title, name, questions };
+}
+
 async function route(req, env, ctx) {
   const url = new URL(req.url);
   const p = url.pathname;
   const m = req.method;
 
   if (!p.startsWith("/api/")) {
-    if (/^\/g\/[A-Za-z0-9_-]{16}$/.test(p)) {
-      const r = await env.ASSETS.fetch(new Request(new URL("/g", url), req));
+    const pg = p.match(/^\/([gq])\/[A-Za-z0-9_-]{16}$/);
+    if (pg) {
+      const r = await env.ASSETS.fetch(new Request(new URL("/" + pg[1], url), req));
       const h = new Headers(r.headers);
       h.set("X-Robots-Tag", "noindex"); h.set("Referrer-Policy", "no-referrer"); h.set("Cache-Control", "no-store");
       return new Response(r.body, { status: r.status, headers: h });
@@ -192,12 +257,13 @@ async function route(req, env, ctx) {
   const user = await currentUser(req, env);
   let x;
 
-  if (p === "/api/config" && m === "GET") return J({ online: paymobReady(env), wa: env.WA_PHONE || "", mail: mailReady(env) });
+  if (p === "/api/config" && m === "GET") return J({ online: paymobReady(env), wa: env.WA_PHONE || "", mail: mailReady(env), wallet: env.WALLET_NUMBER ? { number: env.WALLET_NUMBER, name: env.WALLET_NAME || "" } : null });
   if (p === "/api/health" && m === "GET") {
     const tables = {};
-    for (const t of ["users", "sessions", "gifts", "products", "orders", "email_tokens"]) {
+    for (const t of ["users", "sessions", "gifts", "products", "orders", "email_tokens", "coupons", "receipts", "wheel_spins"]) {
       try { await env.DB.prepare("SELECT 1 FROM " + t + " LIMIT 1").first(); tables[t] = true; } catch { tables[t] = false; }
     }
+    try { await env.DB.prepare("SELECT coupon,discount FROM orders LIMIT 1").first(); tables.orders_discount = true; } catch { tables.orders_discount = false; }
     return J({ kv: !!env.GIFTS, tables, mail: mailReady(env), payments: paymobReady(env) });
   }
   if (p === "/api/me" && m === "GET") return J({ user: user ? pub(user) : null });
@@ -322,6 +388,102 @@ async function route(req, env, ctx) {
     return J(r.results);
   }
   if (p === "/api/orders" && m === "POST") return createOrder(req, env, user);
+
+  // ---- coupons
+  if (p === "/api/coupons/check" && m === "POST") {
+    await limit(env, "cpn:" + ip(req), 60, 3600);
+    const b = await readBody(req);
+    const { total: subtotal } = await priceItems(env, b.items);
+    const cp = await priceWithCoupon(env, user, b.code, subtotal);
+    return J({ ok: true, code: cp.code, subtotal, discount: cp.discount, total: subtotal - cp.discount });
+  }
+  if (p === "/api/my/coupons" && m === "GET") {
+    needUser(user);
+    const r = await env.DB.prepare("SELECT code,kind,value,min_total,expires_at FROM coupons WHERE owner=? AND active=1 AND used<max_uses AND (expires_at=0 OR expires_at>?) ORDER BY created_at DESC LIMIT 50").bind(user.id, Date.now()).all();
+    return J({ coupons: r.results });
+  }
+
+  // ---- lucky wheel
+  if (p === "/api/wheel" && m === "GET") {
+    let can = false;
+    if (user) can = !(await env.DB.prepare("SELECT 1 x FROM wheel_spins WHERE user_id=? AND day=?").bind(user.id, new Date().toISOString().slice(0, 10)).first());
+    return J({ prizes: PRIZES.map((z) => z.label), can_spin: can, logged_in: !!user });
+  }
+  if (p === "/api/wheel/spin" && m === "POST") {
+    needUser(user);
+    const day = new Date().toISOString().slice(0, 10);
+    try { await env.DB.prepare("INSERT INTO wheel_spins(user_id,day) VALUES(?,?)").bind(user.id, day).run(); }
+    catch (e) { if (/UNIQUE|PRIMARY/i.test(String((e && e.message) || ""))) return E("already_spun", 409); throw e; }
+    const sum = PRIZES.reduce((a, z) => a + z.w, 0);
+    let r = randInt(sum), idx = 0;
+    for (; idx < PRIZES.length; idx++) { if (r < PRIZES[idx].w) break; r -= PRIZES[idx].w; }
+    const z = PRIZES[idx];
+    if (!z.kind) return J({ index: idx, prize: { label: z.label }, coupon: null });
+    let code = "W";
+    for (let i = 0; i < 8; i++) code += CODE_CHARS[randInt(CODE_CHARS.length)];
+    const exp = Date.now() + 7 * 86400_000;
+    await env.DB.prepare("INSERT INTO coupons(code,kind,value,min_total,max_uses,used,expires_at,active,first_order_only,owner,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)")
+      .bind(code, z.kind, z.value, 100, 1, 0, exp, 1, 0, user.id, Date.now()).run();
+    return J({ index: idx, prize: { label: z.label }, coupon: { code, expires_at: exp, min_total: 100 } });
+  }
+
+  // ---- wallet receipts
+  if ((x = p.match(/^\/api\/orders\/(\d+)\/receipt$/)) && m === "POST") {
+    await limit(env, "rcpt:" + ip(req), 20, 86400);
+    const b = await readBody(req, 600_000);
+    const row = await env.DB.prepare("SELECT o.user_id,r.token_hash FROM orders o JOIN receipts r ON r.order_id=o.id WHERE o.id=?").bind(Number(x[1])).first();
+    if (!row) return E("not_found", 404);
+    const owner = !!(user && row.user_id && row.user_id === user.id);
+    const tokOk = typeof b.token === "string" && b.token.length >= 20 && safeEq(await sha256hex(b.token), row.token_hash);
+    if (!owner && !tokOk) return E("forbidden", 403);
+    const img = b.image, wallet = b.wallet;
+    if (typeof img !== "string" || img.length > 400_000 || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(img)) return E("bad_image");
+    if (!WALLETS.includes(wallet)) return E("bad_input");
+    const ref = typeof b.ref === "string" ? b.ref.trim().slice(0, 40) : "";
+    await env.DB.prepare("UPDATE receipts SET image=?,wallet=?,ref=?,uploaded_at=? WHERE order_id=?").bind(img, wallet, ref, Date.now(), Number(x[1])).run();
+    return J({ ok: true });
+  }
+
+  // ---- quiz "how well do you know me" (KV only)
+  if (p === "/api/quiz" && m === "POST") {
+    await limit(env, "quiz:" + ip(req), 10, 86400);
+    const q = cleanQuiz(await readBody(req, 60_000));
+    if (!q) return E("bad_input");
+    const id = newId(), token = randToken();
+    await env.GIFTS.put("quiz:" + id, JSON.stringify({ ...q, th: await sha256hex(token), t: Date.now() }), { expirationTtl: 365 * 86400 });
+    await env.GIFTS.put("quizr:" + id, "[]", { expirationTtl: 365 * 86400 });
+    return J({ id, token }, 201);
+  }
+  if ((x = p.match(/^\/api\/quiz\/([A-Za-z0-9_-]{16})$/)) && m === "GET") {
+    const v = await env.GIFTS.get("quiz:" + x[1]);
+    if (!v) return E("not_found", 404);
+    const q = JSON.parse(v);
+    return J({ title: q.title, name: q.name, questions: q.questions.map((k) => ({ q: k.q, options: k.options })) });
+  }
+  if ((x = p.match(/^\/api\/quiz\/([A-Za-z0-9_-]{16})\/submit$/)) && m === "POST") {
+    await limit(env, "qs:" + x[1] + ":" + ip(req), 5, 86400);
+    const v = await env.GIFTS.get("quiz:" + x[1]);
+    if (!v) return E("not_found", 404);
+    const q = JSON.parse(v);
+    const b = await readBody(req);
+    const player = str(b.player, 1, 30);
+    if (!player || !Array.isArray(b.answers) || b.answers.length !== q.questions.length || !b.answers.every((n) => Number.isInteger(n))) return E("bad_input");
+    const correct = q.questions.map((k) => k.a);
+    const score = b.answers.reduce((a, n, i) => a + (n === correct[i] ? 1 : 0), 0);
+    let res = []; try { res = JSON.parse((await env.GIFTS.get("quizr:" + x[1])) || "[]"); } catch {}
+    res.push({ n: player, s: score, t: Date.now() });
+    await env.GIFTS.put("quizr:" + x[1], JSON.stringify(res.slice(-100)), { expirationTtl: 365 * 86400 });
+    return J({ score, total: correct.length, correct });
+  }
+  if ((x = p.match(/^\/api\/quiz\/([A-Za-z0-9_-]{16})\/results$/)) && m === "GET") {
+    const v = await env.GIFTS.get("quiz:" + x[1]);
+    if (!v) return E("not_found", 404);
+    const q = JSON.parse(v);
+    const k = url.searchParams.get("k") || "";
+    if (k.length < 20 || !safeEq(await sha256hex(k), q.th)) return E("forbidden", 403);
+    let res = []; try { res = JSON.parse((await env.GIFTS.get("quizr:" + x[1])) || "[]"); } catch {}
+    return J({ title: q.title, total: q.questions.length, results: res.reverse() });
+  }
   if (p === "/api/my/orders" && m === "GET") {
     needUser(user);
     const r = await env.DB.prepare("SELECT id,items,total,method,status,created_at FROM orders WHERE user_id=? ORDER BY id DESC LIMIT 100").bind(user.id).all();
@@ -364,8 +526,37 @@ async function route(req, env, ctx) {
         return J({ ok: true });
       }
     }
+    if (p === "/api/admin/coupons" && m === "GET") {
+      const r = await env.DB.prepare("SELECT * FROM coupons WHERE owner IS NULL ORDER BY created_at DESC LIMIT 200").all();
+      return J(r.results);
+    }
+    if (p === "/api/admin/coupons" && m === "POST") {
+      const b = await readBody(req);
+      const code = typeof b.code === "string" ? b.code.trim().toUpperCase() : "";
+      const kind = b.kind === "fixed" ? "fixed" : "percent";
+      const value = b.value, minT = b.min_total ?? 0, maxU = b.max_uses ?? 0, days = b.expires_days ?? 0;
+      const okV = Number.isInteger(value) && value >= 1 && value <= (kind === "percent" ? 90 : 100000);
+      if (!CODE_RE.test(code) || !okV || !Number.isInteger(minT) || minT < 0 || !Number.isInteger(maxU) || maxU < 0 || !Number.isInteger(days) || days < 0 || days > 3650) return E("bad_input");
+      try {
+        await env.DB.prepare("INSERT INTO coupons(code,kind,value,min_total,max_uses,used,expires_at,active,first_order_only,owner,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)")
+          .bind(code, kind, value, minT, maxU, 0, days ? Date.now() + days * 86400_000 : 0, 1, b.first_order_only ? 1 : 0, null, Date.now()).run();
+      } catch (e) { if (/UNIQUE|PRIMARY/i.test(String((e && e.message) || ""))) return E("code_taken", 409); throw e; }
+      return J({ ok: true, code }, 201);
+    }
+    if ((x = p.match(/^\/api\/admin\/coupons\/([A-Za-z0-9_-]{3,24})$/))) {
+      if (m === "PUT") {
+        const b = await readBody(req);
+        const r = await env.DB.prepare("UPDATE coupons SET active=? WHERE code=?").bind(b.active ? 1 : 0, x[1]).run();
+        return r.meta.changes ? J({ ok: true }) : E("not_found", 404);
+      }
+      if (m === "DELETE") { await env.DB.prepare("DELETE FROM coupons WHERE code=?").bind(x[1]).run(); return J({ ok: true }); }
+    }
+    if ((x = p.match(/^\/api\/admin\/orders\/(\d+)\/receipt$/)) && m === "GET") {
+      const r = await env.DB.prepare("SELECT image,wallet,ref,uploaded_at FROM receipts WHERE order_id=?").bind(Number(x[1])).first();
+      return r && r.image ? J(r) : E("not_found", 404);
+    }
     if (p === "/api/admin/orders" && m === "GET") {
-      const r = await env.DB.prepare("SELECT * FROM orders ORDER BY id DESC LIMIT 200").all();
+      const r = await env.DB.prepare("SELECT o.*, (SELECT CASE WHEN r.image IS NOT NULL AND r.image!='' THEN 1 ELSE 0 END FROM receipts r WHERE r.order_id=o.id) AS has_receipt, (SELECT r.wallet FROM receipts r WHERE r.order_id=o.id) AS wallet FROM orders o ORDER BY o.id DESC LIMIT 200").all();
       return J(r.results.map((o) => ({ ...o, items: JSON.parse(o.items) })));
     }
     if ((x = p.match(/^\/api\/admin\/orders\/(\d+)$/)) && m === "PUT") {
@@ -384,33 +575,38 @@ async function createOrder(req, env, user) {
   const name = str(b.name, 2, 60);
   const phone = typeof b.phone === "string" ? b.phone.replace(/[\s-]/g, "") : "";
   const address = typeof b.address === "string" && b.address.length <= 300 ? b.address.trim() : null;
-  const method = b.method === "online" ? "online" : "cod";
+  const method = b.method === "online" ? "online" : b.method === "wallet" ? "wallet" : "cod";
   if (!name || !/^\+?\d{8,15}$/.test(phone) || address === null) return E("bad_input");
-  if (!Array.isArray(b.items) || b.items.length < 1 || b.items.length > 20) return E("bad_items");
   if (method === "online" && !paymobReady(env)) return E("online_unavailable");
-  const lines = []; let total = 0;
-  for (const it of b.items) {
-    const id = it && it.id, qty = it && it.qty;
-    if (!Number.isInteger(id) || !Number.isInteger(qty) || qty < 1 || qty > 20) return E("bad_items");
-    const pr = await env.DB.prepare("SELECT id,name,price FROM products WHERE id=? AND active=1").bind(id).first();
-    if (!pr) return E("bad_items");
-    lines.push({ id: pr.id, name: pr.name, price: pr.price, qty });
-    total += pr.price * qty;
+  if (method === "wallet" && !env.WALLET_NUMBER) return E("wallet_unavailable");
+  const { lines, total: subtotal } = await priceItems(env, b.items);
+  const cp = await priceWithCoupon(env, user, b.coupon, subtotal);
+  if (cp.code) {
+    const u = await env.DB.prepare("UPDATE coupons SET used=used+1 WHERE code=? AND (max_uses=0 OR used<max_uses)").bind(cp.code).run();
+    if (!u.meta.changes) return E("coupon_used");
   }
-  const r = await env.DB.prepare("INSERT INTO orders(user_id,name,phone,address,items,total,method,created_at) VALUES(?,?,?,?,?,?,?,?)")
-    .bind(user ? user.id : null, name, phone, address, JSON.stringify(lines), total, method, Date.now()).run();
+  const total = subtotal - cp.discount;
+  const r = await env.DB.prepare("INSERT INTO orders(user_id,name,phone,address,items,total,method,coupon,discount,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)")
+    .bind(user ? user.id : null, name, phone, address, JSON.stringify(lines), total, method, cp.code, cp.discount, Date.now()).run();
   const id = r.meta.last_row_id;
+  const base = { order_id: id, subtotal, discount: cp.discount, total };
+  if (method === "wallet") {
+    const token = randToken();
+    await env.DB.prepare("INSERT INTO receipts(order_id,token_hash) VALUES(?,?)").bind(id, await sha256hex(token)).run();
+    return J({ ...base, token, wallet: { number: env.WALLET_NUMBER, name: env.WALLET_NAME || "" } }, 201);
+  }
   if (method === "online") {
     try {
       const pay = await createPayment(env, { id, total, name, phone });
       await env.DB.prepare("UPDATE orders SET pay_ref=? WHERE id=?").bind(pay.ref, id).run();
-      return J({ order_id: id, total, pay_url: pay.pay_url }, 201);
+      return J({ ...base, pay_url: pay.pay_url }, 201);
     } catch {
       await env.DB.prepare("UPDATE orders SET status='cancelled' WHERE id=?").bind(id).run();
+      if (cp.code) await env.DB.prepare("UPDATE coupons SET used=used-1 WHERE code=? AND used>0").bind(cp.code).run();
       return E("payment_failed", 502);
     }
   }
-  return J({ order_id: id, total }, 201);
+  return J(base, 201);
 }
 
 async function webhook(req, env, url) {

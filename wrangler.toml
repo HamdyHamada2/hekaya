@@ -22,3 +22,6 @@ PAYMOB_IFRAME_ID = ""
 MAIL_FROM = ""
 # رابط موقعك النهائي بدون / في الآخر، مثال: https://yourdomain.com
 SITE_URL = ""
+# دفع المحفظة اليدوي: رقم محفظتك (فودافون كاش/أورانج/اتصالات). اتركه فاضي لتعطيل الخيار
+WALLET_NUMBER = ""
+WALLET_NAME = ""

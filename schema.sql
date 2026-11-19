@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS orders(
   method TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'new',
   pay_ref TEXT,
+  coupon TEXT,
+  discount INTEGER NOT NULL DEFAULT 0,
   created_at INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
@@ -48,4 +50,30 @@ CREATE TABLE IF NOT EXISTS email_tokens(
   user_id INTEGER NOT NULL,
   kind TEXT NOT NULL,
   expires_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS coupons(
+  code TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  value INTEGER NOT NULL,
+  min_total INTEGER NOT NULL DEFAULT 0,
+  max_uses INTEGER NOT NULL DEFAULT 0,
+  used INTEGER NOT NULL DEFAULT 0,
+  expires_at INTEGER NOT NULL DEFAULT 0,
+  active INTEGER NOT NULL DEFAULT 1,
+  first_order_only INTEGER NOT NULL DEFAULT 0,
+  owner INTEGER,
+  created_at INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS receipts(
+  order_id INTEGER PRIMARY KEY,
+  token_hash TEXT NOT NULL,
+  image TEXT,
+  wallet TEXT,
+  ref TEXT,
+  uploaded_at INTEGER
+);
+CREATE TABLE IF NOT EXISTS wheel_spins(
+  user_id INTEGER NOT NULL,
+  day TEXT NOT NULL,
+  PRIMARY KEY(user_id, day)
 );

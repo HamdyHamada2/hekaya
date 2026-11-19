@@ -12,6 +12,7 @@ async function api(path, method = "GET", body) {
   if (method !== "GET") { o.headers["Content-Type"] = "application/json"; o.body = JSON.stringify(body || {}); }
   const r = await fetch("/api" + path, o);
   let j = null; try { j = await r.json(); } catch (e) {}
+  if (j && j.detail) window.__detail = j.detail;
   if (!r.ok || j === null) throw Object.assign(new Error((j && j.error) || (r.status === 404 || j === null ? "no_api" : "error")), { status: r.status });
   return j;
 }
@@ -25,7 +26,7 @@ const ERR = {
   server_error: "قاعدة البيانات مش جاهزة. نفّذ ملف schema.sql في D1 Console.",
   no_api: "السيرفر مش شغال على الموقع. راجع إن الـ Worker منشور ومربوط بالـ KV وD1.",
 };
-const msg = (c) => ERR[c] || "حصل خطأ، جرّب تاني.";
+const msg = (c) => (ERR[c] || "حصل خطأ، جرّب تاني.") + (c === "server_error" && window.__detail ? " [" + window.__detail + "]" : "");
 const date = (ms) => new Date(ms).toLocaleDateString("ar-EG");
 async function mountHeader() {
   const nav = h("nav", {}, h("a", { href: "/" }, "الرئيسية"), h("a", { href: "/store" }, "المتجر"), h("a", { href: "/account" }, "حسابي"));

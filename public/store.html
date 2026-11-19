@@ -2,16 +2,19 @@
 <div id="hdr"></div>
 <main class="w">
 <h1>🛍️ المتجر</h1>
-<p class="mu">هدايا ومنتجات جاهزة للتوصيل.</p>
+<p class="mu">هدايا ومنتجات جاهزة للتوصيل. 🎡 عندك كوبون من <a href="/wheel">عجلة الحظ</a>؟ استخدمه في السلة.</p>
 <div class="grid" id="grid">جاري التحميل…</div>
 <hr>
 <h2>السلة</h2>
 <div id="cart"></div>
 <form id="co" hidden>
+  <div class="row"><input id="c_code" placeholder="كود الخصم (لو عندك)" dir="ltr" maxlength="24" style="flex:1;min-width:150px"><button class="btn o" id="c_apply" type="button">تطبيق</button></div>
+  <div id="c_cmsg" class="err" role="status"></div>
   <label>الاسم<input id="c_name" maxlength="60" required></label>
   <label>رقم الموبايل<input id="c_phone" type="tel" dir="ltr" placeholder="01012345678" required></label>
   <label>العنوان<textarea id="c_addr" rows="2" maxlength="300" required></textarea></label>
   <div class="row"><label class="row"><input type="radio" name="m" value="cod" checked> الدفع عند الاستلام</label>
+  <label class="row" id="m_wallet" hidden><input type="radio" name="m" value="wallet"> محفظة كاش (تحويل)</label>
   <label class="row" id="m_online" hidden><input type="radio" name="m" value="online"> دفع أونلاين</label></div>
   <button class="btn" id="c_go" type="submit">تأكيد الطلب</button>
   <div class="err" id="c_err" role="status"></div>
@@ -22,37 +25,67 @@
 <script>
 (async function(){
   mountHeader();
-  let cfg={},products=[],cart={};
+  let cfg={},products=[],cart={},applied=null;
   try{cart=JSON.parse(localStorage.getItem("hk_cart")||"{}")}catch(e){}
   const save=()=>{try{localStorage.setItem("hk_cart",JSON.stringify(cart))}catch(e){}};
   try{cfg=await api("/config");products=await api("/products")}catch(e){$("#grid").textContent=msg(e.message);return}
   if(cfg.online)$("#m_online").hidden=false;
+  if(cfg.wallet)$("#m_wallet").hidden=false;
   for(const id of Object.keys(cart))if(!products.some(p=>String(p.id)===id))delete cart[id];
   const grid=$("#grid");grid.textContent="";
   if(!products.length)grid.textContent="مفيش منتجات دلوقتي، ارجع قريب 💝";
   products.forEach(p=>grid.append(h("div",{class:"card"},p.image?h("img",{src:p.image,alt:p.name}):null,h("h3",{},p.name),h("p",{class:"mu"},p.description),h("div",{class:"pr"},p.price+" ج.م"),h("button",{class:"btn",type:"button",onclick:()=>{cart[p.id]=Math.min(20,(cart[p.id]||0)+1);save();renderCart()}},"أضف للسلة"))));
+  const items=()=>Object.entries(cart).map(([id,q])=>({id:+id,qty:q}));
+  function subtotal(){return Object.entries(cart).reduce((a,[id,q])=>a+products.find(x=>String(x.id)===id).price*q,0)}
   function renderCart(){
-    const box=$("#cart");box.textContent="";let total=0;const ids=Object.keys(cart);
-    ids.forEach(id=>{const p=products.find(x=>String(x.id)===id),q=cart[id];total+=p.price*q;
+    const box=$("#cart");box.textContent="";const ids=Object.keys(cart),sub=subtotal();
+    if(applied&&applied.subtotal!==sub){applied=null;$("#c_cmsg").className="err";$("#c_cmsg").textContent=ids.length?"السلة اتغيرت، اضغط تطبيق على الكوبون تاني.":""}
+    ids.forEach(id=>{const p=products.find(x=>String(x.id)===id),q=cart[id];
       box.append(h("div",{class:"card row"},h("b",{},p.name),h("span",{class:"mu"},q+" × "+p.price),
         h("button",{class:"btn o",type:"button",onclick:()=>{cart[id]=Math.min(20,q+1);save();renderCart()}},"+"),
         h("button",{class:"btn o",type:"button",onclick:()=>{if(q<=1)delete cart[id];else cart[id]=q-1;save();renderCart()}},"−")))});
-    box.append(ids.length?h("p",{},"الإجمالي: ",h("b",{class:"pr"},total+" ج.م")):h("p",{class:"mu"},"السلة فاضية."));
+    if(!ids.length)box.append(h("p",{class:"mu"},"السلة فاضية."));
+    else{box.append(h("p",{},"المجموع: "+sub+" ج.م"));
+      if(applied)box.append(h("p",{class:"ok"},"خصم ("+applied.code+"): −"+applied.discount+" ج.م"));
+      box.append(h("p",{},"الإجمالي: ",h("b",{class:"pr"},(applied?applied.total:sub)+" ج.م")))}
     $("#co").hidden=!ids.length;
   }
   renderCart();
+  $("#c_apply").onclick=async()=>{
+    const code=$("#c_code").value.trim();$("#c_cmsg").className="err";$("#c_cmsg").textContent="";
+    if(!code){applied=null;renderCart();return}
+    try{applied=await api("/coupons/check","POST",{code,items:items()});$("#c_cmsg").className="ok";$("#c_cmsg").textContent="تم تطبيق الخصم ✅"}
+    catch(e){applied=null;$("#c_cmsg").textContent=msg(e.message)}
+    renderCart();
+  };
   try{const r=await api("/me");if(r.user)$("#c_name").value=r.user.name}catch(e){}
   $("#co").onsubmit=async e=>{
     e.preventDefault();$("#c_err").textContent="";$("#c_go").disabled=true;
     try{
-      const items=Object.entries(cart).map(([id,q])=>({id:+id,qty:q}));
-      const r=await api("/orders","POST",{name:$("#c_name").value,phone:$("#c_phone").value,address:$("#c_addr").value,method:document.querySelector('input[name=m]:checked').value,items});
-      cart={};save();
+      const method=document.querySelector('input[name=m]:checked').value;
+      const r=await api("/orders","POST",{name:$("#c_name").value,phone:$("#c_phone").value,address:$("#c_addr").value,method,items:items(),coupon:$("#c_code").value.trim()||undefined});
+      cart={};save();applied=null;
       if(r.pay_url){location.href=r.pay_url;return}
       $("#co").hidden=true;$("#cart").textContent="";
       const d=$("#done");d.hidden=false;d.textContent="";
-      d.append(h("h2",{},"تم استلام طلبك ✅"),h("p",{},"رقم الطلب: #"+r.order_id+" — الإجمالي "+r.total+" ج.م"),
-        cfg.wa?h("a",{class:"btn",target:"_blank",rel:"noopener",href:"https://wa.me/"+cfg.wa+"?text="+encodeURIComponent("أهلًا، ده طلبي رقم #"+r.order_id)},"تأكيد على واتساب"):null);
+      d.append(h("h2",{},"تم استلام طلبك ✅"),h("p",{},"رقم الطلب: #"+r.order_id+" — الإجمالي "+r.total+" ج.م"+(r.discount?" (بعد خصم "+r.discount+" ج.م)":"")));
+      if(r.wallet){
+        const w=h("select",{},[["vodafone","فودافون كاش"],["orange","أورانج كاش"],["etisalat","اتصالات كاش"],["we","WE Pay"],["instapay","انستاباي"],["other","محفظة أخرى"]].map(([v,t])=>h("option",{value:v},t)));
+        const ref=h("input",{placeholder:"رقم العملية (اختياري)",maxlength:"40",dir:"ltr"});
+        const file=h("input",{type:"file",accept:"image/*"});
+        const st=h("div",{class:"err",role:"status"});
+        const go=h("button",{class:"btn",type:"button",onclick:()=>{
+          if(!file.files[0]){st.textContent="اختار صورة الإيصال الأول.";return}
+          go.disabled=true;st.textContent="";
+          compressImage(file.files[0],800,async img=>{
+            try{await api("/orders/"+r.order_id+"/receipt","POST",{token:r.token,image:img,wallet:w.value,ref:ref.value});st.className="ok";st.textContent="وصلنا الإيصال ✅ هنراجع الدفع ونأكد طلبك على واتساب."}
+            catch(er){st.className="err";st.textContent=msg(er.message);go.disabled=false}
+          },()=>{st.textContent="الصورة غير مدعومة.";go.disabled=false});
+        }},"رفع الإيصال");
+        d.append(h("div",{class:"card"},h("p",{},"حوّل ",h("b",{},r.total+" ج.م")," على رقم ",h("b",{dir:"ltr"},r.wallet.number),r.wallet.name?" ("+r.wallet.name+")":"","، وبعدين ارفع صورة الإيصال هنا:"),
+          h("label",{},"المحفظة",w),h("label",{},"رقم العملية",ref),h("label",{},"صورة الإيصال",file),go,st));
+      }
+      if(cfg.wa)d.append(h("a",{class:"btn o",target:"_blank",rel:"noopener",href:"https://wa.me/"+cfg.wa+"?text="+encodeURIComponent("أهلًا، ده طلبي رقم #"+r.order_id)},"تواصل على واتساب"));
     }catch(er){$("#c_err").textContent=msg(er.message)}
     $("#c_go").disabled=false;
   };

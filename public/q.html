@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Tajawal:wght@400;500;700&display=swap"><link rel="stylesheet" href="/site.css"><meta name="robots" content="noindex"><title>اختبار | حكاية حب</title></head><body>
+<div id="hdr"></div>
+<main class="w">
+<div id="top"><h1 id="title">…</h1><p class="mu" id="by"></p></div>
+<form id="f" hidden>
+  <label>اسمك<input id="p" maxlength="30" required></label>
+  <div id="qs"></div>
+  <button class="btn" type="submit">شوف نتيجتي</button>
+  <div class="err" id="e" role="status"></div>
+</form>
+<div id="res" class="card" hidden></div>
+</main>
+<script src="/app.js"></script>
+<script>
+mountHeader();
+const id=location.pathname.split("/").pop();let quiz=null;
+(async()=>{
+  try{quiz=await api("/quiz/"+encodeURIComponent(id))}catch(e){$("#title").textContent="الاختبار مش موجود";$("#by").textContent="الرابط غلط أو اتحذف.";return}
+  $("#title").textContent=quiz.title;$("#by").textContent="اختبار من "+quiz.name;document.title=quiz.title;
+  quiz.questions.forEach((q,i)=>$("#qs").append(h("div",{class:"card"},h("b",{},(i+1)+") "+q.q),
+    q.options.map((o,j)=>h("label",{class:"row"},h("input",{type:"radio",name:"a"+i,value:String(j)}),o)))));
+  $("#f").hidden=false;
+})();
+$("#f").onsubmit=async e=>{
+  e.preventDefault();$("#e").textContent="";
+  const answers=[];
+  for(let i=0;i<quiz.questions.length;i++){const c=document.querySelector('input[name=a'+i+']:checked');if(!c){$("#e").textContent="جاوب على كل الأسئلة (ناقص سؤال "+(i+1)+").";return}answers.push(+c.value)}
+  try{
+    const r=await api("/quiz/"+encodeURIComponent(id)+"/submit","POST",{player:$("#p").value,answers});
+    $("#f").hidden=true;const b=$("#res");b.hidden=false;b.textContent="";
+    const pct=r.score/r.total,say=pct===1?"إنت فعلًا عارفني! 💞":pct>=.6?"عارفني كويس 😉":pct>=.3?"لسه محتاج تتعرف عليا أكتر 😅":"إنت مين أصلًا؟ 😂";
+    b.append(h("h2",{},"نتيجتك: "+r.score+" من "+r.total),h("p",{},say));
+    quiz.questions.forEach((q,i)=>{const ok=answers[i]===r.correct[i];b.append(h("div",{class:ok?"ok":"err"},(ok?"✅ ":"❌ ")+q.q+" — "+(ok?q.options[answers[i]]:"الصح: "+q.options[r.correct[i]])))});
+    b.append(h("p",{},h("a",{class:"btn",href:"/quiz"},"اعمل اختبارك أنت")));
+  }catch(er){$("#e").textContent=er.message==="rate_limited"?"جاوبت كتير، جرّب بكرة.":msg(er.message)}
+};
+</script></body></html>

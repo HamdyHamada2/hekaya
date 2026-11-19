@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Tajawal:wght@400;500;700&display=swap"><link rel="stylesheet" href="/site.css"><title>عجلة الحظ | حكاية حب</title><style>
+.wrap{position:relative;max-width:340px;margin:20px auto;text-align:center}
+#wheel{width:100%;height:auto;transition:transform 4.5s cubic-bezier(.12,.7,.1,1);border-radius:50%;border:6px solid var(--gold)}
+.ptr{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:34px;color:var(--rose);z-index:2}
+@media(prefers-reduced-motion:reduce){#wheel{transition:none}}
+</style></head><body>
+<div id="hdr"></div>
+<main class="w">
+<h1>🎡 عجلة الحظ</h1>
+<p class="mu">لفّة واحدة كل يوم. الكوبون بيتحفظ على حسابك ويصلح 7 أيام لطلبات من 100 ج.م فما فوق.</p>
+<div class="wrap"><div class="ptr" aria-hidden="true">▼</div><canvas id="wheel" width="320" height="320" role="img" aria-label="عجلة الحظ"></canvas></div>
+<div style="text-align:center"><button class="btn" id="spin" type="button" disabled>لفّ العجلة</button><div id="msg" class="err" role="status"></div></div>
+<div id="login" class="card" hidden>لازم <a href="/account">تسجّل دخول</a> الأول عشان تلف العجلة.</div>
+<div id="prize" class="card" hidden></div>
+<h2 style="margin-top:24px">كوبوناتي</h2><div id="mine" class="mu">—</div>
+</main>
+<script src="/app.js"></script>
+<script>
+(async function(){
+  mountHeader();
+  let prizes=[],cur=0,logged=false;
+  const cv=$("#wheel"),g=cv.getContext("2d"),COL=["#d63a62","#7b3fe4","#b8801f","#2f9e6e","#e0709a","#4a90a4"];
+  function draw(){
+    const N=prizes.length,seg=2*Math.PI/N,C=160;
+    prizes.forEach((t,i)=>{
+      const a=-Math.PI/2+i*seg;
+      g.beginPath();g.moveTo(C,C);g.arc(C,C,C-2,a,a+seg);g.closePath();g.fillStyle=COL[i%COL.length];g.fill();g.strokeStyle="#fff";g.lineWidth=2;g.stroke();
+      g.save();g.translate(C,C);g.rotate(a+seg/2);g.textAlign="right";g.fillStyle="#fff";g.font="700 16px Tahoma,sans-serif";g.fillText(t,C-16,6);g.restore();
+    });
+  }
+  async function loadMine(){
+    const box=$("#mine");
+    try{const r=await api("/my/coupons");box.textContent="";
+      if(!r.coupons.length)box.textContent="مفيش كوبونات شغالة دلوقتي.";
+      r.coupons.forEach(c=>box.append(h("div",{class:"card row"},h("b",{dir:"ltr"},c.code),h("span",{class:"mu"},(c.kind==="percent"?c.value+"%":c.value+" ج.م")+" · لحد "+date(c.expires_at)),
+        h("button",{class:"btn o",type:"button",onclick:function(){try{navigator.clipboard.writeText(c.code);this.textContent="تم النسخ ✓"}catch(e){}}},"نسخ"))));
+    }catch(e){box.textContent=logged?msg(e.message):"سجّل دخول عشان تشوف كوبوناتك."}
+  }
+  try{
+    const w=await api("/wheel");prizes=w.prizes;logged=w.logged_in;draw();
+    if(!logged)$("#login").hidden=false;
+    else{$("#spin").disabled=!w.can_spin;if(!w.can_spin){$("#msg").textContent="لفّيت النهاردة، ارجع بكرة 🎡"}loadMine()}
+    if(!logged)$("#mine").textContent="سجّل دخول عشان تشوف كوبوناتك.";
+  }catch(e){$("#msg").textContent=msg(e.message);return}
+  $("#spin").onclick=async()=>{
+    $("#spin").disabled=true;$("#msg").textContent="";$("#prize").hidden=true;
+    let r;try{r=await api("/wheel/spin","POST")}catch(e){$("#msg").textContent=msg(e.message);return}
+    const seg=360/prizes.length,c=r.index*seg+seg/2;
+    cur=cur+1800+((360-((c+cur)%360))%360);
+    cv.style.transform="rotate("+cur+"deg)";
+    const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+    setTimeout(()=>{
+      const b=$("#prize");b.hidden=false;b.textContent="";
+      if(r.coupon){b.append(h("h2",{},"🎉 كسبت "+r.prize.label),h("p",{},"كودك: ",h("b",{dir:"ltr"},r.coupon.code)),h("p",{class:"mu"},"صالح 7 أيام لطلبات من "+r.coupon.min_total+" ج.م. استخدمه في "),h("a",{class:"btn",href:"/store"},"المتجر"))}
+      else b.append(h("h2",{},"حظ أوفر المرة دي 😅"),h("p",{class:"mu"},"جرّب تاني بكرة!"));
+      loadMine();
+    },reduce?0:4700);
+  };
+})();
+</script></body></html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Tajawal:wght@400;500;700&display=swap"><link rel="stylesheet" href="/site.css"><title>تعرفني قد إيه؟ | حكاية حب</title></head><body>
+<div id="hdr"></div>
+<main class="w">
+<h1>🎯 تعرفني قد إيه؟</h1>
+<p class="mu">اكتب أسئلة عنك (لونك المفضل، أكلتك...) وابعت الرابط لحبيبك أو صاحبك. هو بيجاوب وانت تشوف نتيجته.</p>
+<form id="f" class="card">
+  <label>عنوان الاختبار<input id="t" maxlength="80" value="تعرفني قد إيه؟" required></label>
+  <label>اسمك<input id="n" maxlength="40" required></label>
+  <div id="qs"></div>
+  <div class="row"><button class="btn o" id="add" type="button">+ سؤال</button><button class="btn" type="submit">إنشاء الرابط</button></div>
+  <div class="err" id="e" role="status"></div>
+</form>
+<div id="made" class="card" hidden></div>
+<h2>اختباراتي</h2><div id="mine" class="mu">—</div>
+</main>
+<script src="/app.js"></script>
+<script>
+mountHeader();
+const LS="hk_quizzes";
+const mine=()=>{try{return JSON.parse(localStorage.getItem(LS)||"[]")}catch(e){return []}};
+let count=0;
+function addQ(){
+  if(count>=10)return;count++;const k=count;
+  const radios=[0,1,2,3].map(i=>h("label",{class:"row"},h("input",{type:"radio",name:"c"+k,value:String(i),...(i===0?{checked:""}:{})}),h("input",{class:"o"+k,placeholder:"الاختيار "+(i+1)+(i<2?"":" (اختياري)"),maxlength:"60",style:"flex:1"})));
+  $("#qs").append(h("div",{class:"card",id:"qb"+k},h("label",{},"سؤال "+k,h("input",{class:"q"+k,maxlength:"120",placeholder:"مثال: إيه لوني المفضل؟"})),h("div",{class:"mu"},"علّم الإجابة الصح:"),radios));
+}
+addQ();addQ();addQ();
+$("#add").onclick=addQ;
+function renderMine(){
+  const box=$("#mine"),l=mine();box.textContent="";
+  if(!l.length){box.textContent="لسه معملتش اختبارات من الجهاز ده.";return}
+  l.forEach(q=>{const res=h("div",{});box.append(h("div",{class:"card"},h("b",{},q.title),h("div",{class:"row"},
+    h("a",{class:"btn o",href:"/q/"+q.id,target:"_blank",rel:"noopener"},"فتح"),
+    h("button",{class:"btn o",type:"button",onclick:async()=>{res.textContent="…";try{const r=await api("/quiz/"+q.id+"/results?k="+encodeURIComponent(q.token));res.textContent="";
+      if(!r.results.length)res.textContent="لسه محدش جاوب.";
+      r.results.forEach(x=>res.append(h("div",{},x.n+" — "+x.s+" من "+r.total+" ("+date(x.t)+")")))}catch(e){res.textContent=msg(e.message)}}},"النتائج")),res))});
+}
+renderMine();
+$("#f").onsubmit=async e=>{
+  e.preventDefault();$("#e").textContent="";
+  const questions=[];
+  for(let k=1;k<=count;k++){
+    const q=$(".q"+k).value.trim();if(!q)continue;
+    const opts=[...document.querySelectorAll(".o"+k)].map(x=>x.value.trim());
+    const checked=+document.querySelector('input[name=c'+k+']:checked').value;
+    if(!opts[checked]){$("#e").textContent="الإجابة الصح في السؤال "+k+" فاضية.";return}
+    const keep=[];let a=0;opts.forEach((o,i)=>{if(o){if(i===checked)a=keep.length;keep.push(o)}});
+    if(keep.length<2){$("#e").textContent="لازم اختيارين على الأقل في السؤال "+k;return}
+    questions.push({q,options:keep,a});
+  }
+  if(!questions.length){$("#e").textContent="اكتب سؤال واحد على الأقل.";return}
+  try{
+    const r=await api("/quiz","POST",{title:$("#t").value,name:$("#n").value,questions});
+    const l=mine();l.unshift({id:r.id,token:r.token,title:$("#t").value});try{localStorage.setItem(LS,JSON.stringify(l.slice(0,20)))}catch(x){}
+    const link=location.origin+"/q/"+r.id,m=$("#made");m.hidden=false;m.textContent="";
+    m.append(h("h2",{},"الاختبار جاهز ✅"),h("p",{dir:"ltr",style:"word-break:break-all"},link),
+      h("div",{class:"row"},h("button",{class:"btn o",type:"button",onclick:function(){try{navigator.clipboard.writeText(link);this.textContent="تم النسخ ✓"}catch(x){}}},"نسخ الرابط"),
+        h("a",{class:"btn",target:"_blank",rel:"noopener",href:"https://wa.me/?text="+encodeURIComponent("تعرفني قد إيه؟ 😏 جرّب الاختبار ده:\n"+link)},"إرسال واتساب")),
+      h("p",{class:"mu"},"النتائج بتظهر لك تحت في «اختباراتي» (على نفس الجهاز والمتصفح)."));
+    renderMine();
+  }catch(er){$("#e").textContent=er.message==="bad_input"?"راجع الأسئلة والاختيارات.":msg(er.message)}
+};
+</script></body></html>

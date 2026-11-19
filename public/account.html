@@ -58,4 +58,20 @@ $("#f_fg").onsubmit=async e=>{e.preventDefault();$("#fg_msg").className="err";$(
   $("#panel").hidden=false;$("#hello").textContent="أهلًا "+u.name+" 👋";
   loadGifts();loadOrders();
 })();
+async function loadOrders(){
+  const box=$("#orders");
+  try{const r=await api("/my/orders");box.textContent="";
+    if(!r.orders.length)box.textContent="مفيش طلبات لسه.";
+    r.orders.forEach(o=>{
+      const card=h("div",{class:"card"},h("b",{},"طلب #"+o.id+" — "+o.total+" ج.م"),h("div",{class:"mu"},date(o.created_at)+" · "+(SL[o.status]||o.status)),h("div",{},o.items.map(i=>i.name+" ×"+i.qty).join("، ")));
+      if(o.method==="wallet"&&o.status==="new"){
+        const w=h("select",{},[["vodafone","فودافون كاش"],["orange","أورانج كاش"],["etisalat","اتصالات كاش"],["we","WE Pay"],["instapay","انستاباي"],["other","محفظة أخرى"]].map(([v,t])=>h("option",{value:v},t)));
+        const f=h("input",{type:"file",accept:"image/*"}),st=h("div",{class:"err",role:"status"});
+        const go=h("button",{class:"btn o",type:"button",onclick:()=>{if(!f.files[0]){st.textContent="اختار صورة الإيصال.";return}go.disabled=true;st.textContent="";
+          compressImage(f.files[0],800,async img=>{try{await api("/orders/"+o.id+"/receipt","POST",{image:img,wallet:w.value});st.className="ok";st.textContent="وصلنا الإيصال ✅"}catch(e){st.className="err";st.textContent=msg(e.message);go.disabled=false}},()=>{st.textContent="الصورة غير مدعومة";go.disabled=false})}},"رفع إيصال الدفع");
+        card.append(h("div",{class:"mu"},"الدفع بمحفظة كاش — لو لسه مرفعتش الإيصال:"),w,f,go,st);
+      }
+      box.append(card)});
+  }catch(e){box.textContent=msg(e.message)}
+}
 </script></body></html>

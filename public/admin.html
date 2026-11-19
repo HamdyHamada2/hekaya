@@ -5,7 +5,22 @@
 <div id="dash" hidden>
   <h1>لوحة الإدارة</h1>
   <div class="stats" id="stats"></div>
+
   <h2 style="margin-top:24px">الطلبات</h2><div id="orders" class="mu">جاري التحميل…</div>
+
+  <h2 style="margin-top:24px">كوبونات الخصم</h2>
+  <form id="cf" class="card">
+    <div class="row"><label style="flex:1;min-width:130px">الكود<input id="k_c" maxlength="24" dir="ltr" placeholder="WELCOME10" required></label>
+    <label style="flex:1;min-width:110px">النوع<select id="k_k"><option value="percent">نسبة %</option><option value="fixed">مبلغ ثابت</option></select></label>
+    <label style="flex:1;min-width:90px">القيمة<input id="k_v" type="number" min="1" step="1" required></label></div>
+    <div class="row"><label style="flex:1;min-width:110px">حد أدنى للطلب<input id="k_m" type="number" min="0" step="1" value="0"></label>
+    <label style="flex:1;min-width:110px">أقصى استخدامات (0 = مفتوح)<input id="k_u" type="number" min="0" step="1" value="0"></label>
+    <label style="flex:1;min-width:110px">ينتهي بعد (أيام، 0 = مفتوح)<input id="k_d" type="number" min="0" step="1" value="0"></label></div>
+    <label class="row"><input id="k_f" type="checkbox"> لأول طلب بس (لازم تسجيل دخول)</label>
+    <button class="btn" type="submit">إضافة الكوبون</button><div class="err" id="k_e" role="status"></div>
+  </form>
+  <div id="coupons"></div>
+
   <h2 style="margin-top:24px">المنتجات</h2>
   <form id="pf" class="card">
     <label>اسم المنتج<input id="p_n" maxlength="80" required></label>
@@ -22,6 +37,8 @@
 <script src="/app.js"></script>
 <script>
 const SL={new:"جديد",paid:"مدفوع",preparing:"جاري التجهيز",shipped:"خرج للتوصيل",done:"تم التسليم",cancelled:"ملغي"};
+const WN={vodafone:"فودافون كاش",orange:"أورانج كاش",etisalat:"اتصالات كاش",we:"WE Pay",instapay:"انستاباي",other:"محفظة أخرى"};
+const MN={cod:"عند الاستلام",online:"أونلاين",wallet:"محفظة"};
 let editing=null,img="";
 function resetForm(){editing=null;img="";$("#pf").reset();$("#p_a").checked=true;$("#p_c").hidden=true;$("#p_e").textContent=""}
 $("#p_c").onclick=resetForm;
@@ -32,16 +49,41 @@ $("#pf").onsubmit=async e=>{
   try{if(editing)await api("/admin/products/"+editing,"PUT",body);else await api("/admin/products","POST",body);resetForm();loadProds()}
   catch(er){$("#p_e").textContent=er.message==="bad_input"?"راجع الاسم والسعر (رقم صحيح) وحجم الصورة":msg(er.message)}
 };
+$("#cf").onsubmit=async e=>{
+  e.preventDefault();$("#k_e").textContent="";
+  const n=id=>parseInt($(id).value,10);
+  try{await api("/admin/coupons","POST",{code:$("#k_c").value,kind:$("#k_k").value,value:n("#k_v"),min_total:n("#k_m")||0,max_uses:n("#k_u")||0,expires_days:n("#k_d")||0,first_order_only:$("#k_f").checked});
+    $("#cf").reset();loadCoupons()}
+  catch(er){$("#k_e").textContent=er.message==="bad_input"?"راجع الكود (حروف إنجليزي وأرقام 3-24) والقيمة (النسبة حتى 90)":msg(er.message)}
+};
 async function loadStats(){try{const s=await api("/admin/stats");const st=$("#stats");st.textContent="";
   [["مستخدمين",s.users],["هدايا",s.gifts],["طلبات",s.orders],["إيرادات (ج.م)",s.revenue]].forEach(([l,v])=>st.append(h("div",{},h("b",{},String(v)),l)))}catch(e){}}
 async function loadOrders(){
   const box=$("#orders");
   try{const os=await api("/admin/orders");box.textContent="";
     if(!os.length)box.textContent="مفيش طلبات.";
-    os.forEach(o=>{const sel=h("select",{onchange:async()=>{try{await api("/admin/orders/"+o.id,"PUT",{status:sel.value});loadStats()}catch(e){alert(msg(e.message))}}},
+    os.forEach(o=>{
+      const sel=h("select",{onchange:async()=>{try{await api("/admin/orders/"+o.id,"PUT",{status:sel.value});loadStats()}catch(e){alert(msg(e.message))}}},
         Object.entries(SL).map(([k,v])=>{const op=h("option",{value:k},v);if(k===o.status)op.selected=true;return op}));
-      box.append(h("div",{class:"card"},h("b",{},"#"+o.id+" — "+o.name+" — "+o.total+" ج.م ("+(o.method==="online"?"أونلاين":"عند الاستلام")+")"),
-        h("div",{dir:"ltr",class:"mu"},o.phone),h("div",{class:"mu"},o.address||"—"),h("div",{},o.items.map(i=>i.name+" ×"+i.qty).join("، ")),h("div",{class:"mu"},date(o.created_at)),sel))});
+      const rc=h("div",{});
+      const card=h("div",{class:"card"},h("b",{},"#"+o.id+" — "+o.name+" — "+o.total+" ج.م ("+(MN[o.method]||o.method)+")"),
+        o.discount?h("div",{class:"ok"},"كوبون "+o.coupon+": −"+o.discount+" ج.م"):null,
+        h("div",{dir:"ltr",class:"mu"},o.phone),h("div",{class:"mu"},o.address||"—"),h("div",{},o.items.map(i=>i.name+" ×"+i.qty).join("، ")),h("div",{class:"mu"},date(o.created_at)),
+        o.method==="wallet"?h("div",{},o.has_receipt?h("button",{class:"btn o",type:"button",onclick:async function(){
+          rc.textContent="…";try{const r=await api("/admin/orders/"+o.id+"/receipt");rc.textContent="";
+            rc.append(h("div",{class:"mu"},(WN[r.wallet]||r.wallet)+(r.ref?" — عملية: "+r.ref:"")+" — "+date(r.uploaded_at)),h("img",{src:r.image,alt:"إيصال",style:"max-width:100%;border-radius:12px;margin-top:6px"}))}catch(e){rc.textContent=msg(e.message)}}},"عرض الإيصال"):h("span",{class:"err"},"لسه مرفعش إيصال")):null,
+        rc,sel);
+      box.append(card)});
+  }catch(e){box.textContent=msg(e.message)}
+}
+async function loadCoupons(){
+  const box=$("#coupons");
+  try{const cs=await api("/admin/coupons");box.textContent="";
+    if(!cs.length)box.textContent="لسه مفيش كوبونات.";
+    cs.forEach(c=>box.append(h("div",{class:"card row"},h("b",{dir:"ltr"},c.code),
+      h("span",{class:"mu"},(c.kind==="percent"?c.value+"%":c.value+" ج.م")+" · استخدم "+c.used+(c.max_uses?"/"+c.max_uses:"")+(c.min_total?" · من "+c.min_total+" ج.م":"")+(c.first_order_only?" · أول طلب":"")+(c.expires_at?" · لحد "+date(c.expires_at):"")+(c.active?"":" (موقوف)")),
+      h("button",{class:"btn o",type:"button",onclick:async()=>{try{await api("/admin/coupons/"+c.code,"PUT",{active:c.active?0:1});loadCoupons()}catch(e){alert(msg(e.message))}}},c.active?"إيقاف":"تفعيل"),
+      h("button",{class:"btn o",type:"button",onclick:async()=>{if(!confirm("حذف الكوبون؟"))return;try{await api("/admin/coupons/"+c.code,"DELETE");loadCoupons()}catch(e){alert(msg(e.message))}}},"حذف"))));
   }catch(e){box.textContent=msg(e.message)}
 }
 async function loadProds(){
@@ -56,6 +98,6 @@ async function loadProds(){
 (async()=>{
   const u=await mountHeader();
   if(!u||u.role!=="admin"){$("#gate").hidden=false;return}
-  $("#dash").hidden=false;loadStats();loadOrders();loadProds();
+  $("#dash").hidden=false;loadStats();loadOrders();loadCoupons();loadProds();
 })();
 </script></body></html>

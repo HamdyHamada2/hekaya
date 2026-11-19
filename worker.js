@@ -182,6 +182,13 @@ async function route(req, env, ctx) {
   let x;
 
   if (p === "/api/config" && m === "GET") return J({ online: paymobReady(env), wa: env.WA_PHONE || "" });
+  if (p === "/api/health" && m === "GET") {
+    const tables = {};
+    for (const t of ["users", "sessions", "gifts", "products", "orders"]) {
+      try { await env.DB.prepare("SELECT 1 FROM " + t + " LIMIT 1").first(); tables[t] = true; } catch { tables[t] = false; }
+    }
+    return J({ kv: !!env.GIFTS, tables });
+  }
   if (p === "/api/me" && m === "GET") return J({ user: user ? pub(user) : null });
 
   // ---- auth
@@ -201,7 +208,10 @@ async function route(req, env, ctx) {
       const r = await env.DB.prepare("INSERT INTO users(email,name,pw_hash,pw_salt,role,created_at) VALUES(?,?,?,?,?,?)")
         .bind(email, name, hash, b64(salt), admin ? "admin" : "user", Date.now()).run();
       id = r.meta.last_row_id;
-    } catch { return E("email_taken", 409); }
+    } catch (e) {
+      if (/UNIQUE/i.test(String((e && e.message) || e))) return E("email_taken", 409);
+      throw e;
+    }
     return J({ user: { id, email, name, role: admin ? "admin" : "user" } }, 201, { "Set-Cookie": await startSession(env, id) });
   }
   if (p === "/api/auth/login" && m === "POST") {
@@ -376,7 +386,7 @@ export default {
     catch (e) {
       if (e instanceof Response) return e;
       console.error(e);
-      return E("server_error", 500);
+      return J({ error: "server_error", ...(env.DEBUG === "1" ? { detail: String((e && e.message) || e).slice(0, 200) } : {}) }, 500);
     }
   },
 };

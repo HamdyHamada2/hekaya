@@ -14,12 +14,13 @@
 <div id="prize" class="card" hidden></div>
 <h2 style="margin-top:24px">كوبوناتي</h2><div id="mine" class="mu">—</div>
 </main>
+<script src="/shell.js"></script>
 <script src="/app.js"></script>
 <script>
 (async function(){
   mountHeader();
   let prizes=[],cur=0,logged=false;
-  const cv=$("#wheel"),g=cv.getContext("2d"),COL=["#d63a62","#7b3fe4","#b8801f","#2f9e6e","#e0709a","#4a90a4"];
+  const cv=$("#wheel"),g=cv.getContext("2d"),COL=["#8a6d1c","#2a2418","#b8912a","#1c1812","#a67c1d","#3a2f18"];
   function draw(){
     const N=prizes.length,seg=2*Math.PI/N,C=160;
     prizes.forEach((t,i)=>{

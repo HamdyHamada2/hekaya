@@ -35,12 +35,9 @@ const ERR = {
 const msg = (c) => (ERR[c] || "حصل خطأ، جرّب تاني.") + (c === "server_error" && window.__detail ? " [" + window.__detail + "]" : "");
 const date = (ms) => new Date(ms).toLocaleDateString("ar-EG");
 async function mountHeader() {
-  const nav = h("nav", {}, h("a", { href: "/" }, "الرئيسية"), h("a", { href: "/store" }, "المتجر"), h("a", { href: "/account" }, "حسابي"));
-  for (const a of nav.querySelectorAll("a")) if (a.getAttribute("href") === location.pathname) a.className = "on";
-  $("#hdr").replaceWith(h("header", { class: "top" }, h("a", { class: "logo", href: "/" }, "حكاية حب"), nav));
   try {
     const r = await api("/me");
-    if (r.user && r.user.role === "admin") nav.append(h("a", { href: "/admin", class: location.pathname === "/admin" ? "on" : "" }, "الإدارة"));
+    if (window.HK) HK.setUser(r.user);
     return r.user;
   } catch (e) { return null; }
 }

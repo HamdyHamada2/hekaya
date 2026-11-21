@@ -105,7 +105,7 @@
       '<button class="hk-lang" type="button" id="hk-lang">' + t("lang_btn") + "</button></div>";
     tabs.innerHTML = LINKS.map((x) => '<a href="' + x[0] + '"' + (isOn(x[0]) ? ' class="on" aria-current="page"' : "") + ">" + svg(IC[x[2]]) + "<span>" + t(x[1]) + "</span></a>").join("");
     foot.innerHTML = '<div class="hk-fin"><div class="hk-logo" style="font-size:20px">' + LOGO + "<span>" + (lang === "ar" ? "حكاية حب" : "Hekaya Hob") + "</span></div><div>" + t("foot_tag") + "</div>" +
-      '<div class="hk-flinks"><a href="/create">' + t("nav_studio") + '</a><a href="/studio">' + t("nav_tools") + '</a><a href="/store">' + t("nav_store") + '</a><a href="/quiz">' + t("nav_quiz") + '</a><a href="/wheel">' + t("nav_offers") + '</a><a href="/account">' + t("nav_account") + "</a></div>" +
+      '<div class="hk-flinks"><a href="/create">' + t("nav_studio") + '</a><a href="/studio">' + t("nav_tools") + '</a><a href="/store">' + t("nav_store") + '</a><a href="/quiz">' + t("nav_quiz") + '</a><a href="/wheel">' + t("nav_offers") + '</a><a href="/account">' + t("nav_account") + "</a>" + (admin ? '<a href="/admin">' + t("nav_admin") + "</a>" : "") + "</div>" +
       "<div>" + t("foot_priv") + "</div><div dir=\"ltr\">© 2026 " + (lang === "ar" ? "حكاية حب" : "Hekaya Hob") + " — " + t("foot_rights") + " · Eng: Hamdy Hamada</div></div>";
     document.getElementById("hk-lang").onclick = () => HK.setLang(lang === "ar" ? "en" : "ar");
   }

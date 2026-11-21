@@ -57,6 +57,7 @@ $("#f_fg").onsubmit=async e=>{e.preventDefault();$("#fg_msg").className="err";$(
   const u=await mountHeader();
   if(!u){$("#auth").hidden=false;return}
   $("#panel").hidden=false;$("#hello").textContent="أهلًا "+u.name+" 👋";
+  if(u.role==="admin")$("#hello").after(h("p",{},h("a",{class:"btn",href:"/admin"},"فتح لوحة الإدارة")));
   loadGifts();loadOrders();
 })();
 async function loadOrders(){

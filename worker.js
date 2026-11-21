@@ -349,12 +349,13 @@ async function route(req, env, ctx) {
     await limit(env, "gift:" + ip(req), 20, 86400);
     const b = await readBody(req, MAX_E + 1000);
     const { E: blob, a, b: c2, U } = b;
+    const lg = b.l === "en" ? "en" : "ar";
     if (typeof blob !== "string" || blob.length < 40 || !/^[A-Za-z0-9+/=]+$/.test(blob)) return E("bad_payload");
     if (blob.length > MAX_E) return E("too_large", 413);
     if (!HEX.test(a) || !HEX.test(c2)) return E("bad_colors");
     const u = Number.isFinite(U) && U > 0 ? Math.floor(U) : 0;
     const id = newId();
-    await env.GIFTS.put("g:" + id, JSON.stringify({ E: blob, a, b: c2, U: u, t: Date.now() }), { expirationTtl: 365 * 86400 });
+    await env.GIFTS.put("g:" + id, JSON.stringify({ E: blob, a, b: c2, U: u, l: lg, t: Date.now() }), { expirationTtl: 365 * 86400 });
     await env.DB.prepare("INSERT INTO gifts(id,user_id,created_at) VALUES(?,?,?)").bind(id, user ? user.id : null, Date.now()).run();
     return J({ id }, 201);
   }

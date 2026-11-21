@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title data-i18n="c_title">اصنع هديتك | حكاية حب</title>
+<link rel="stylesheet" href="/site.css">
+<style id="hk-core-css">
+.gx{position:relative;min-height:100%;display:grid;place-items:center;padding:24px;text-align:center;overflow:hidden;color:#ece4d3;background:radial-gradient(900px 520px at 50% 0%,var(--ga,#2a2113),var(--gb,#0e0c09));font:500 18px/1.8 Tajawal,Inter,system-ui,sans-serif}
+.gx *{box-sizing:border-box}
+.gx-in{position:relative;z-index:1;width:100%;max-width:460px}
+.gx h2{margin:0 0 10px;font:700 30px/1.35 Amiri,"Playfair Display",Georgia,serif;color:var(--ac,#c9a45c)}
+.gx p{margin:0 0 12px;color:#bdb39c}
+.gx-ico{font-size:46px;margin-bottom:6px}
+.gx-count{margin-top:10px;font:700 20px Inter,Tajawal,sans-serif;color:var(--ac,#c9a45c);direction:ltr;word-spacing:2px}
+.gx-inp{display:block;width:100%;margin:12px 0 8px;padding:13px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.28);color:#ece4d3;font:inherit;text-align:center}
+.gx-btn{display:inline-block;margin:6px;padding:11px 28px;border:0;border-radius:999px;cursor:pointer;font:700 16px Tajawal,Inter,sans-serif;color:#1a1408;background:linear-gradient(135deg,#e9d6a0,#c9a45c 55%,#a98a46)}
+.gx-btn:disabled{opacity:.55}
+.gx-sm{padding:7px 18px;font-size:14px}
+.gx-err{min-height:1.7em;color:#ff9a90}
+.gx-tip{margin-top:6px;color:var(--ac,#c9a45c);font-weight:700;animation:gxp 1.6s ease-in-out infinite}
+@keyframes gxp{50%{opacity:.45}}
+.gx button:focus-visible,.gx input:focus-visible{outline:3px solid #e9d6a0;outline-offset:3px}
+.gx-box,.gx-env{display:block;margin:0 auto;border:0;background:none;padding:0;cursor:pointer;color:inherit}
+.gx-box{width:min(78vw,300px);height:min(78vw,300px)}
+.gx-box svg{width:100%;height:100%;overflow:visible}
+.gx-box .gx-l,.gx-box .gx-bw,.gx-box .gx-c{transform-box:fill-box;transition:transform 1s cubic-bezier(.3,.8,.3,1)}
+.gx-box .gx-l{transform-origin:0% 100%}
+.gx-box .gx-bw{transform-origin:50% 100%}
+.gx-box:not(.open){animation:gxb 2.4s ease-in-out infinite}
+@keyframes gxb{50%{transform:translateY(-6px)}}
+.gx-box.open .gx-l{transform:translate(-14px,-34px) rotate(-26deg)}
+.gx-box.open .gx-bw{transform:translate(-30px,-46px) rotate(-26deg)}
+.gx-c{transform:translateY(86px)}
+.gx-box.open .gx-c{transform:translateY(-6px);transition-delay:.35s}
+.gx-env{position:relative;width:min(80vw,290px);height:min(54vw,196px)}
+.gx-eb,.gx-ef,.gx-ep,.gx-el{position:absolute}
+.gx-eb{inset:0;background:#b8943f;border-radius:8px}
+.gx-el{left:10%;right:10%;top:8%;height:80%;background:#ece4d3;border-radius:6px;padding:14% 12% 0;transition:transform 1s ease .35s;z-index:2}
+.gx-el i{display:block;height:5px;margin-bottom:9px;border-radius:3px;background:#c9bb94}
+.gx-ef{inset:0;z-index:3;border-radius:8px;background:linear-gradient(135deg,transparent 49.5%,#a98a46 50%) left/50% 100% no-repeat,linear-gradient(225deg,transparent 49.5%,#a98a46 50%) right/50% 100% no-repeat,linear-gradient(to top,#c9a45c 0,#c9a45c 100%) bottom/100% 55% no-repeat}
+.gx-ep{left:0;right:0;top:0;height:58%;z-index:4;background:#d9c07f;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .6s ease,z-index 0s .3s;border-radius:8px 8px 0 0}
+.gx-env:not(.open){animation:gxb 2.4s ease-in-out infinite}
+.gx-env.open .gx-ep{transform:rotateX(180deg);z-index:1}
+.gx-env.open .gx-el{transform:translateY(-62%)}
+.gx-scr{position:relative;width:min(80vw,300px);aspect-ratio:3/2;margin:0 auto 10px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14)}
+.gx-under{position:absolute;inset:0;display:grid;place-content:center;background:rgba(0,0,0,.3)}
+.gx-cv{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;transition:opacity .6s}
+.gx-cv.gone{opacity:0;pointer-events:none}
+.gx-card{animation:gxin .7s ease both}
+@keyframes gxin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.gx-ph{display:block;max-width:100%;max-height:340px;margin:10px auto;border-radius:18px}
+.gx-au{width:100%;margin:10px 0}
+.gx-msg{white-space:pre-wrap;font-size:20px;line-height:1.9;margin:8px 0}
+.gx-from{margin-top:10px;color:var(--ac,#c9a45c);font-weight:700}
+.gx-mu{position:absolute;top:12px;inset-inline-start:12px;z-index:3;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.35);color:#e9d6a0;font-size:16px;cursor:pointer}
+.gx-h{position:absolute;bottom:-30px;z-index:0;color:var(--ac,#c9a45c);opacity:.35;pointer-events:none;animation:gxu linear infinite}
+@keyframes gxu{to{transform:translateY(-110vh)}}
+@media(prefers-reduced-motion:reduce){.gx-tip,.gx-box:not(.open),.gx-env:not(.open),.gx-h{animation:none}.gx-card{animation:none}.gx-box .gx-l,.gx-box .gx-bw,.gx-box .gx-c,.gx-el,.gx-ep{transition:none}}
+</style>
+<style>
+.cs-prog{display:flex;gap:6px;list-style:none;margin:0 0 22px;padding:0}
+.cs-prog li{flex:1;display:grid;gap:4px;justify-items:center;text-align:center;font-size:13px;color:var(--mu)}
+.cs-prog b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:1px solid #473d28;font:600 14px Inter,sans-serif}
+.cs-prog li.on{color:var(--gold)}
+.cs-prog li.on b,.cs-prog li.done b{background:linear-gradient(135deg,#e9d6a0,#c9a45c);color:#1a1408;border-color:transparent}
+.cs-pane h2{font-size:22px;margin:22px 0 10px}
+.cs-pane h2:first-child{margin-top:0}
+.cs-chips{display:flex;flex-wrap:wrap;gap:8px}
+.cs-chip{border:1px solid #473d28;background:var(--bg2);color:var(--tx);border-radius:999px;padding:8px 18px;font:500 15px Tajawal,Inter,sans-serif;cursor:pointer}
+.cs-chip[aria-pressed=true]{border-color:var(--rose);color:var(--gold);background:rgba(201,164,92,.12)}
+.cs-cards{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:700px){.cs-cards{grid-template-columns:repeat(4,1fr)}}
+.cs-card{display:grid;gap:4px;justify-items:center;padding:16px 8px;border:1px solid var(--ln);border-radius:18px;background:var(--bg2);color:var(--tx);cursor:pointer;font:600 15px Tajawal,Inter,sans-serif}
+.cs-card i{font-style:normal;font-size:30px}
+.cs-card[aria-pressed=true]{border-color:var(--rose);box-shadow:0 0 0 1px var(--rose) inset;color:var(--gold)}
+.cs-sw{display:flex;gap:14px;flex-wrap:wrap}
+.cs-s{display:grid;gap:6px;justify-items:center;background:none;border:0;color:var(--mu);cursor:pointer;font:500 13px Tajawal,Inter,sans-serif}
+.cs-s span{width:44px;height:44px;border-radius:50%;border:2px solid transparent;box-shadow:0 0 0 1px #473d28 inset}
+.cs-s[aria-pressed=true] span{border-color:var(--gold)}
+.cs-s[aria-pressed=true]{color:var(--gold)}
+.cs-nav{display:flex;gap:10px;justify-content:space-between;margin-top:26px}
+.cs-nav .sp{flex:1}
+.cs-rec{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cs-res{margin-top:14px}
+.cs-res a.l{display:block;word-break:break-all;direction:ltr;margin:6px 0}
+#pv4.gx{min-height:480px;border-radius:24px;border:1px solid var(--ln)}
+.cs-ov{position:fixed;inset:0;z-index:200;background:#0e0c09;overflow:auto}
+.cs-ov .gx{min-height:100vh}
+.cs-x{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));inset-inline-end:14px;z-index:201;width:44px;height:44px;border-radius:50%;border:1px solid #473d28;background:rgba(20,17,13,.8);color:var(--gold);font-size:24px;cursor:pointer}
+</style>
+</head>
+<body data-i18n-page>
+<div id="hdr"></div>
+<main class="w">
+<h1 data-i18n="c_title">اصنع هديتك</h1>
+<ol class="cs-prog" id="prog" aria-label="Steps">
+  <li class="on"><b>1</b><span data-i18n="c_s1">الفكرة</span></li>
+  <li><b>2</b><span data-i18n="c_s2">المحتوى</span></li>
+  <li><b>3</b><span data-i18n="c_s3">الحماية</span></li>
+  <li><b>4</b><span data-i18n="c_s4">المعاينة</span></li>
+</ol>
+
+<section id="p1" class="cs-pane">
+  <h2 data-i18n="c_occ">المناسبة</h2><div class="cs-chips" id="occ" role="group"></div>
+  <h2 data-i18n="c_style">طريقة فتح الهدية</h2><div class="cs-cards" id="sty" role="group"></div>
+  <h2 data-i18n="c_theme">اللون</h2><div class="cs-sw" id="thm" role="group"></div>
+</section>
+
+<section id="p2" class="cs-pane" hidden>
+  <form onsubmit="return false">
+    <label><span data-i18n="c_to">اسم المُهدى إليه</span><input id="f_to" maxlength="40" autocomplete="off"></label>
+    <label><span data-i18n="c_from">اسمك</span><input id="f_from" maxlength="40" autocomplete="off"></label>
+    <label><span data-i18n="c_msg">الرسالة</span><textarea id="f_msg" rows="5" maxlength="900"></textarea></label>
+    <div><button class="btn o" id="sug" type="button" data-i18n="c_suggest">💡 اقترح عبارة</button></div>
+    <label><span data-i18n="c_photo">صورة (اختياري)</span><input id="f_photo" type="file" accept="image/*"></label>
+    <div class="cs-rec"><button class="btn o" id="rec" type="button" data-i18n="c_rec">🎙️ سجّل</button><span class="mu" id="recst"></span></div>
+    <label><span data-i18n="c_music">موسيقى (حتى 10 ميجا)</span><input id="f_music" type="file" accept="audio/*"></label>
+  </form>
+</section>
+
+<section id="p3" class="cs-pane" hidden>
+  <form onsubmit="return false">
+    <label><span data-i18n="c_pw">كلمة السر (اختياري، ومطلوبة للرابط)</span><input id="f_pw" type="password" autocomplete="new-password" maxlength="60"></label>
+    <p class="mu" style="margin:0" data-i18n="c_pw_hint">كلمة سر طويلة أقوى. لو نسيتها مفيش استرجاع. من غير كلمة سر الهدية مش بتتشفّر.</p>
+    <label><span data-i18n="c_unlock">تتفتح في (كبسولة زمن، اختياري)</span><input id="f_unlock" type="datetime-local"></label>
+    <div><b data-i18n="c_glang">لغة الهدية</b>
+      <div class="row" style="margin-top:6px"><label class="row"><input type="radio" name="gl" value="ar"> <span data-i18n="c_ar">العربية</span></label><label class="row"><input type="radio" name="gl" value="en"> <span>English</span></label></div></div>
+  </form>
+</section>
+
+<section id="p4" class="cs-pane" hidden>
+  <div id="pv4" class="gx"></div>
+  <div class="row" style="margin-top:16px">
+    <button class="btn" id="mklink" type="button" data-i18n="c_link">إنشاء رابط</button>
+    <button class="btn o" id="mkfile" type="button" data-i18n="c_file">تنزيل كملف</button>
+  </div>
+  <div class="err" id="err4" role="status"></div>
+  <div class="cs-res card" id="res" hidden></div>
+</section>
+
+<div class="err" id="err" role="status"></div>
+<div class="cs-nav">
+  <button class="btn o" id="back" type="button" data-i18n="c_back">رجوع</button>
+  <span class="sp"></span>
+  <button class="btn o" id="pvb" type="button" data-i18n="c_preview">معاينة</button>
+  <button class="btn" id="next" type="button" data-i18n="c_next">التالي</button>
+</div>
+</main>
+<div class="cs-ov" id="ov" hidden><button class="cs-x" id="ovx" type="button" aria-label="Close">×</button><div id="ovp"></div></div>
+
+<script src="/shell.js"></script>
+<script>
+function hkMakeGift() {
+  var STR = {
+    ar: { open: "اضغط لفتح الهدية", env: "اضغط لفتح الرسالة", scr: "امسح بإصبعك لتكشف الهدية", skip: "أظهر مباشرة", pwT: "هدية خاصة", pwH: "اكتب كلمة السر اللي وصلتلك", pwB: "افتح", pwBad: "كلمة السر غير صحيحة", lock: "الهدية لسه مقفولة", opens: "بتتفتح يوم", to: "إلى ", fr: "من ", replay: "إعادة التشغيل", d: "يوم", h: "ساعة", m: "دقيقة", s: "ثانية", mus: "موسيقى" },
+    en: { open: "Tap to open your gift", env: "Tap to open the letter", scr: "Scratch with your finger to reveal", skip: "Reveal now", pwT: "A private gift", pwH: "Enter the password you were sent", pwB: "Open", pwBad: "Wrong password", lock: "This gift is still locked", opens: "It opens on", to: "For ", fr: "From ", replay: "Replay", d: "d", h: "h", m: "m", s: "s", mus: "Music" }
+  };
+  var TH = {
+    gold: { a: "#2a2113", b: "#0e0c09", c: "#c9a45c" },
+    rose: { a: "#3a1424", b: "#150810", c: "#e0a3b5" },
+    night: { a: "#14213a", b: "#080c16", c: "#9fb7e6" },
+    garden: { a: "#123326", b: "#08140e", c: "#9fd4b2" }
+  };
+  var IMG = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
+  var AUD = /^data:audio\/[a-z0-9.+-]+(;codecs=[^;,]+)?;base64,[A-Za-z0-9+\/=]+$/i;
+  var BOX = '<svg viewBox="0 0 300 300" aria-hidden="true"><defs><linearGradient id="gxa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9d6a0"/><stop offset=".55" stop-color="#c9a45c"/><stop offset="1" stop-color="#86692a"/></linearGradient><linearGradient id="gxb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9c07f"/><stop offset="1" stop-color="#a98a46"/></linearGradient></defs><ellipse cx="150" cy="268" rx="96" ry="10" fill="#000" opacity=".4"/><g class="gx-c"><rect x="82" y="92" width="136" height="104" rx="8" fill="#ece4d3"/><path d="M150 150c-12-9-20-15-20-23a10 10 0 0 1 20-3 10 10 0 0 1 20 3c0 8-8 14-20 23z" fill="#c9a45c"/></g><rect x="62" y="160" width="176" height="104" rx="8" fill="url(#gxb)"/><rect x="140" y="160" width="20" height="104" fill="#14110d" opacity=".22"/><g class="gx-l"><rect x="52" y="132" width="196" height="34" rx="7" fill="url(#gxa)"/><rect x="140" y="132" width="20" height="34" fill="#14110d" opacity=".2"/></g><g class="gx-bw"><ellipse cx="128" cy="124" rx="20" ry="11" fill="url(#gxa)" transform="rotate(-18 128 124)"/><ellipse cx="172" cy="124" rx="20" ry="11" fill="url(#gxa)" transform="rotate(18 172 124)"/><circle cx="150" cy="126" r="8" fill="#a98a46"/></g></svg>';
+  var ENV = '<div class="gx-eb"></div><div class="gx-el"><i></i><i></i><i></i></div><div class="gx-ef"></div><div class="gx-ep"></div>';
+  function el(t, c, h) { var e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; }
+  function tx(t, c, s) { var e = el(t, c); e.textContent = s; return e; }
+  function ub(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  async function dec(E, p) {
+    var u = ub(E), km = await crypto.subtle.importKey("raw", new TextEncoder().encode(p), "PBKDF2", false, ["deriveKey"]);
+    var k = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: u.slice(0, 16), iterations: 150000, hash: "SHA-256" }, km, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    var pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: u.slice(16, 28) }, k, u.slice(28));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+  function gift(root, D, o) {
+    if (root._gxStop) root._gxStop();
+    o = o || {};
+    var L = D.L === "en" ? "en" : "ar", S = STR[L], stops = [], mu = null;
+    root._gxStop = function () { stops.forEach(function (f) { try { f(); } catch (e) {} }); stops = []; root._gxStop = null; };
+    root.className = "gx"; root.setAttribute("dir", L === "ar" ? "rtl" : "ltr"); root.setAttribute("lang", L);
+    root.style.setProperty("--ga", D.a || TH.gold.a); root.style.setProperty("--gb", D.b || TH.gold.b); root.style.setProperty("--ac", TH.gold.c);
+    root.textContent = "";
+    var inner = el("div", "gx-in"); root.appendChild(inner);
+    function screen() { inner.textContent = ""; for (var i = 0; i < arguments.length; i++) inner.appendChild(arguments[i]); }
+    function every(fn, ms) { var id = setInterval(fn, ms); stops.push(function () { clearInterval(id); }); return id; }
+    function later(fn, ms) { var id = setTimeout(fn, ms); stops.push(function () { clearTimeout(id); }); return id; }
+    function head(d) { var n = String(d.to || "").trim(); return n ? S.to + n : String(d.title || ""); }
+    function hearts() {
+      for (var j = 0; j < 12; j++) {
+        var s = el("span", "gx-h", "♥");
+        s.style.left = Math.random() * 100 + "%"; s.style.fontSize = 14 + Math.random() * 20 + "px";
+        s.style.animationDuration = 8 + Math.random() * 8 + "s"; s.style.animationDelay = -Math.random() * 10 + "s";
+        root.appendChild(s);
+      }
+    }
+    function type(m, t) {
+      var red = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion:reduce)").matches;
+      if (red || !t) { m.textContent = t; return; }
+      var k = 0, id = every(function () { k += 2; m.textContent = t.slice(0, k); if (k >= t.length) clearInterval(id); }, 38);
+    }
+    function music(d) {
+      if (o.preview || mu || !d.music || !AUD.test(d.music)) return;
+      var au = new Audio(d.music); au.loop = true; mu = au; stops.push(function () { au.pause(); });
+      var b = tx("button", "gx-mu", "♪"); b.type = "button"; b.setAttribute("aria-label", S.mus);
+      b.addEventListener("click", function () { if (au.paused) { au.play(); b.textContent = "❚❚"; } else { au.pause(); b.textContent = "♪"; } });
+      root.appendChild(b);
+      var pr = au.play(); if (pr && pr.then) pr.then(function () { b.textContent = "❚❚"; }).catch(function () {});
+    }
+    function reveal(d) {
+      var card = el("div", "gx-card"), m = el("div", "gx-msg");
+      card.appendChild(tx("h2", "", head(d)));
+      if (d.photo && IMG.test(d.photo)) { var im = el("img", "gx-ph"); im.src = d.photo; im.alt = ""; card.appendChild(im); }
+      if (d.voice && AUD.test(d.voice)) { var a = el("audio", "gx-au"); a.controls = true; a.src = d.voice; card.appendChild(a); }
+      card.appendChild(m);
+      if (d.from) card.appendChild(tx("div", "gx-from", S.fr + d.from));
+      if (o.preview) { var rp = tx("button", "gx-btn gx-sm", S.replay); rp.type = "button"; rp.addEventListener("click", function () { gift(root, D, o); }); card.appendChild(rp); }
+      screen(card); type(m, String(d.msg || "")); hearts();
+    }
+    function introBox(d) {
+      var w = el("button", "gx-box", BOX); w.type = "button"; w.setAttribute("aria-label", S.open);
+      var tip = tx("div", "gx-tip", S.open); screen(w, tip);
+      w.addEventListener("click", function () { if (w.classList.contains("open")) return; w.classList.add("open"); tip.textContent = ""; music(d); later(function () { reveal(d); }, 1900); });
+    }
+    function introEnv(d) {
+      var w = el("button", "gx-env", ENV); w.type = "button"; w.setAttribute("aria-label", S.env);
+      var tip = tx("div", "gx-tip", S.env); screen(w, tip);
+      w.addEventListener("click", function () { if (w.classList.contains("open")) return; w.classList.add("open"); tip.textContent = ""; music(d); later(function () { reveal(d); }, 1700); });
+    }
+    function introScratch(d) {
+      var wrap = el("div", "gx-scr"), under = el("div", "gx-under"), cv = el("canvas", "gx-cv"), W = 300, H = 200;
+      under.appendChild(tx("div", "gx-ico", "🎁")); under.appendChild(tx("h2", "", head(d)));
+      cv.width = W; cv.height = H; wrap.appendChild(under); wrap.appendChild(cv);
+      var skip = tx("button", "gx-btn gx-sm", S.skip); skip.type = "button";
+      screen(wrap, skip);
+      var ctx = cv.getContext("2d"), g = ctx.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, "#e9d6a0"); g.addColorStop(0.5, "#b8943f"); g.addColorStop(1, "#d9c07f");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(20,14,4,.55)"; ctx.font = "700 18px Tajawal,Inter,sans-serif"; ctx.textAlign = "center"; ctx.fillText(S.scr, W / 2, H / 2 + 6);
+      cv.style.touchAction = "none";
+      var down = false, n = 0, done = false;
+      function finish() { if (done) return; done = true; cv.classList.add("gone"); later(function () { reveal(d); }, 650); }
+      function pos(e) { var r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / (r.width || W), (e.clientY - r.top) * H / (r.height || H)]; }
+      function check() { var a = ctx.getImageData(0, 0, W, H).data, c = 0, t = 0; for (var i = 3; i < a.length; i += 64) { t++; if (a[i] === 0) c++; } if (c / t > 0.4) finish(); }
+      function scratch(e) { if (!down || done) return; var p = pos(e); ctx.globalCompositeOperation = "destination-out"; ctx.beginPath(); ctx.arc(p[0], p[1], 20, 0, 7); ctx.fill(); if (++n % 6 === 0) check(); }
+      cv.addEventListener("pointerdown", function (e) { down = true; music(d); scratch(e); });
+      cv.addEventListener("pointermove", scratch);
+      cv.addEventListener("pointerup", function () { down = false; });
+      cv.addEventListener("pointercancel", function () { down = false; });
+      skip.addEventListener("click", function () { music(d); finish(); });
+    }
+    function begin(d) {
+      var th = TH[d.theme] || TH.gold;
+      root.style.setProperty("--ga", th.a); root.style.setProperty("--gb", th.b); root.style.setProperty("--ac", th.c);
+      if (d.style === "box") introBox(d); else if (d.style === "envelope") introEnv(d); else if (d.style === "scratch") introScratch(d); else { music(d); reveal(d); }
+    }
+    function capsule() {
+      var cd = tx("div", "gx-count", ""), id;
+      screen(tx("div", "gx-ico", "⏳"), tx("h2", "", S.lock), tx("p", "", S.opens + " " + new Date(D.U).toLocaleString(L === "ar" ? "ar-EG" : "en-GB", { dateStyle: "full", timeStyle: "short" })), cd);
+      function tick() { var s = Math.floor((D.U - Date.now()) / 1000); if (s <= 0) { clearInterval(id); after(); return; } cd.textContent = Math.floor(s / 86400) + " " + S.d + "  " + Math.floor(s % 86400 / 3600) + " " + S.h + "  " + Math.floor(s % 3600 / 60) + " " + S.m + "  " + (s % 60) + " " + S.s; }
+      tick(); id = every(tick, 1000);
+    }
+    function gate() {
+      var input = el("input", "gx-inp"); input.type = "password"; input.autocomplete = "off"; input.placeholder = "••••••"; input.setAttribute("aria-label", S.pwH);
+      var btn = tx("button", "gx-btn", S.pwB); btn.type = "button";
+      var msg = tx("div", "gx-err", ""); msg.setAttribute("role", "status"); var busy = false;
+      async function go() {
+        if (busy) return; var pw = input.value.trim(); if (!pw) return; busy = true; msg.textContent = ""; btn.disabled = true;
+        var d = null; try { d = await dec(D.E, pw); } catch (e) {}
+        if (!d) { msg.textContent = S.pwBad; btn.disabled = false; busy = false; return; }
+        begin(d);
+      }
+      btn.addEventListener("click", go); input.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+      screen(tx("div", "gx-ico", "🔒"), tx("h2", "", S.pwT), tx("p", "", S.pwH), input, btn, msg);
+      later(function () { try { input.focus(); } catch (e) {} }, 50);
+    }
+    function after() { if (D.E) gate(); else begin(D.P || {}); }
+    if (D.U && Date.now() < D.U && !o.preview) capsule(); else after();
+  }
+  gift.dec = dec;
+  return gift;
+}
+</script>
+<script>
+HK.add({
+  ar: { c_title: "اصنع هديتك", c_s1: "الفكرة", c_s2: "المحتوى", c_s3: "الحماية", c_s4: "المعاينة", c_occ: "المناسبة", c_other: "أخرى", c_style: "طريقة فتح الهدية", c_box: "صندوق هدية", c_env: "مظروف", c_scr: "كارت خدش", c_plain: "مباشرة", c_theme: "اللون", c_t_gold: "ذهبي", c_t_rose: "وردي", c_t_night: "ليلي", c_t_garden: "أخضر",
+    c_to: "اسم المُهدى إليه", c_from: "اسمك", c_msg: "الرسالة", c_suggest: "💡 اقترح عبارة", c_photo: "صورة (اختياري)", c_rec: "🎙️ سجّل", c_stop: "⏹ إيقاف", c_rec_ok: "تم التسجيل ✓", c_music: "موسيقى (حتى 10 ميجا)",
+    c_pw: "كلمة السر (اختياري، ومطلوبة للرابط)", c_pw_hint: "كلمة سر طويلة أقوى. لو نسيتها مفيش استرجاع. من غير كلمة سر الهدية مش بتتشفّر.", c_unlock: "تتفتح في (كبسولة زمن، اختياري)", c_glang: "لغة الهدية", c_ar: "العربية",
+    c_back: "رجوع", c_next: "التالي", c_preview: "معاينة", c_link: "إنشاء رابط", c_file: "تنزيل كملف", c_copy: "نسخ الرابط", c_copied: "تم النسخ ✓", c_wa: "إرسال واتساب", c_qr: "كود QR",
+    c_note_pw: "ابعت كلمة السر في رسالة منفصلة. الرابط بيفضل شغال سنة.", c_ok_link: "الرابط جاهز ✅", c_ok_file: "تم تجهيز الملف ✅ افتحه في المتصفح وابعته.",
+    c_e_msg: "اكتب اسم المُهدى إليه والرسالة.", c_e_pw6: "الرابط محتاج كلمة سر 6 حروف على الأقل.", c_e_mic: "تعذر الوصول للميكروفون.", c_e_big: "الحجم كبير جدًا، قلّل الصورة أو الصوت.", c_e_link: "تعذر إنشاء الرابط. جرّب تاني.", c_e_rate: "وصلت للحد اليومي، جرّب بكرة.", c_e_file: "الملف غير مدعوم أو كبير.", c_creating: "جاري الإنشاء…", c_wa_text: "جهزتلك هدية 🎁", c_wa_pw: "كلمة السر هبعتهالك في رسالة لوحدها." },
+  en: { c_title: "Create your gift", c_s1: "Idea", c_s2: "Content", c_s3: "Lock", c_s4: "Preview", c_occ: "Occasion", c_other: "Other", c_style: "How it opens", c_box: "Gift box", c_env: "Envelope", c_scr: "Scratch card", c_plain: "Direct", c_theme: "Colour", c_t_gold: "Gold", c_t_rose: "Rose", c_t_night: "Night", c_t_garden: "Garden",
+    c_to: "Recipient's name", c_from: "Your name", c_msg: "Message", c_suggest: "💡 Suggest a line", c_photo: "Photo (optional)", c_rec: "🎙️ Record", c_stop: "⏹ Stop", c_rec_ok: "Recorded ✓", c_music: "Music (up to 10 MB)",
+    c_pw: "Password (optional, required for a link)", c_pw_hint: "A longer password is stronger. It cannot be recovered. Without a password the gift is not encrypted.", c_unlock: "Opens on (time capsule, optional)", c_glang: "Gift language", c_ar: "Arabic",
+    c_back: "Back", c_next: "Next", c_preview: "Preview", c_link: "Create link", c_file: "Download file", c_copy: "Copy link", c_copied: "Copied ✓", c_wa: "Send on WhatsApp", c_qr: "QR code",
+    c_note_pw: "Send the password in a separate message. The link stays active for a year.", c_ok_link: "Your link is ready ✅", c_ok_file: "File ready ✅ Open it in a browser and send it.",
+    c_e_msg: "Enter the recipient's name and a message.", c_e_pw6: "A link needs a password of at least 6 characters.", c_e_mic: "Couldn't access the microphone.", c_e_big: "Too large. Use a smaller photo or audio.", c_e_link: "Couldn't create the link. Try again.", c_e_rate: "Daily limit reached. Try tomorrow.", c_e_file: "Unsupported or too large.", c_creating: "Creating…", c_wa_text: "I made you a gift 🎁", c_wa_pw: "I'll send you the password in a separate message." }
+});
+(function () {
+  var $ = function (s) { return document.querySelector(s); }, t = function (k) { return HK.t(k); };
+  var gift = hkMakeGift();
+  var AB = { gold: ["#2a2113", "#0e0c09"], rose: ["#3a1424", "#150810"], night: ["#14213a", "#080c16"], garden: ["#123326", "#08140e"] };
+  var OCC = [["birthday", "i_birthday", "box", "gold"], ["love", "i_love", "envelope", "rose"], ["wedding", "i_wedding", "box", "gold"], ["mother", "i_mother", "envelope", "garden"], ["sorry", "i_sorry", "envelope", "night"], ["grad", "i_grad", "scratch", "gold"], ["other", "c_other", "plain", "gold"]];
+  var STY = [["box", "c_box", "🎁"], ["envelope", "c_env", "💌"], ["scratch", "c_scr", "✨"], ["plain", "c_plain", "📜"]];
+  var THM = [["gold", "c_t_gold", "#c9a45c"], ["rose", "c_t_rose", "#e0a3b5"], ["night", "c_t_night", "#9fb7e6"], ["garden", "c_t_garden", "#9fd4b2"]];
+  var PH = {
+    ar: { birthday: ["كل سنة وإنت أحلى حاجة حصلت في حياتي.", "سنة جديدة وحلم جديد، وأنا جنبك في كل خطوة.", "النهارده يوم مميز لأنه يوم ميلاد أغلى إنسان.", "وجودك بيخلي الأيام العادية أحلى، فكل سنة وإنت طيب."],
+      love: ["في كل عيد حب، أنا بحبك أكتر من اللي قبله.", "إنت الحب اللي ماكنتش بدوّر عليه ولقيته.", "كل الأيام عيد لو كنت معايا.", "قلبي اختارك مرة، وبيختارك كل يوم من جديد."],
+      wedding: ["مبروك بداية الحكاية، وربنا يتمم لكم على خير.", "ربنا يجمع بينكم دايمًا في مودة ورحمة.", "فرحتنا بيكم مالهاش حدود، ألف مبروك.", "رحلة جديدة بإيديكم الاتنين، ربنا يسعدكم فيها."],
+      mother: ["إنتِ أول حب في حياتي وأصدقه.", "كل خطوة نجحت فيها كانت بدعوة منك.", "مهما كبرت هفضل محتاج حضنك.", "ربنا يخليكي لينا ويبارك في عمرك يا أغلى الناس."],
+      sorry: ["أنا آسف، وبتمنى نبدأ من جديد بقلب أصفى.", "خسارتك أصعب عليّا من أي خلاف.", "سامحني، وخلّينا نرجع زي ما كنا وأحلى.", "مفيش خلاف يستاهل نخسر بعض عشانه."],
+      grad: ["مبروك التخرج، تعبك طلع نجاح يفتخر بيه الكل.", "النهارده بداية طريق جديد، وأنا واثق إنك هتوصل بعيد.", "فخور بيك، وبكرة أحلى بإذن الله.", "ألف مبروك، والقادم أجمل."],
+      other: ["كل الأيام أحلى وإنت موجود فيها.", "شكرًا إنك دايمًا جنبي.", "حبيت أقولك إنك مهم عندي أكتر مما تتخيل."] },
+    en: { birthday: ["Happy birthday to the best thing that ever happened to me.", "A new year, a new dream, and I'm beside you every step.", "Today is special because it's the birthday of someone precious.", "You make ordinary days brighter. Happy birthday."],
+      love: ["Every Valentine's, I love you more than the one before.", "You're the love I wasn't looking for, and found.", "Every day is a celebration when you're with me.", "My heart chose you once, and chooses you again every day."],
+      wedding: ["Congratulations on the start of your story. May it be blessed.", "May you always be together in love and kindness.", "Our joy for you has no limits. Congratulations!", "A new journey, hand in hand. Wishing you happiness."],
+      mother: ["You are my first love and my truest.", "Every success I've had began with your prayers.", "No matter how old I get, I'll still need your hug.", "May you always be with us, the most precious person."],
+      sorry: ["I'm sorry. I hope we can start again with clearer hearts.", "Losing you hurts more than any argument.", "Forgive me, and let's go back to how we were, only better.", "No disagreement is worth losing each other."],
+      grad: ["Congratulations, graduate. Your hard work became a success we're all proud of.", "Today is the start of a new road, and I know you'll go far.", "I'm proud of you, and tomorrow is brighter.", "Congratulations. The best is yet to come."],
+      other: ["Every day is better with you in it.", "Thank you for always being by my side.", "I wanted you to know how much you matter to me."] }
+  };
+  var st = { o: "birthday", style: "box", theme: "gold", photo: "", music: "", voice: "", step: 1, glang: HK.lang };
+  var sc = {}, mr = null, chunks = [];
+  var qo = new URLSearchParams(location.search).get("o");
+  OCC.forEach(function (x) { if (x[0] === qo) { st.o = x[0]; st.style = x[2]; st.theme = x[3]; } });
+
+  function chip(cls, pressed, label, onclick, icon, colour) {
+    var b = document.createElement("button"); b.type = "button"; b.className = cls; b.setAttribute("aria-pressed", pressed ? "true" : "false");
+    if (icon) { var i = document.createElement("i"); i.textContent = icon; b.appendChild(i); }
+    if (colour) { var s = document.createElement("span"); s.style.background = colour; b.appendChild(s); }
+    b.appendChild(document.createTextNode(label)); b.addEventListener("click", onclick); return b;
+  }
+  function renderChoices() {
+    var a = $("#occ"), b = $("#sty"), c = $("#thm"); a.textContent = ""; b.textContent = ""; c.textContent = "";
+    OCC.forEach(function (x) { a.appendChild(chip("cs-chip", st.o === x[0], t(x[1]), function () { st.o = x[0]; st.style = x[2]; st.theme = x[3]; renderChoices(); })); });
+    STY.forEach(function (x) { b.appendChild(chip("cs-card", st.style === x[0], t(x[1]), function () { st.style = x[0]; renderChoices(); }, x[2])); });
+    THM.forEach(function (x) { c.appendChild(chip("cs-s", st.theme === x[0], t(x[1]), function () { st.theme = x[0]; renderChoices(); }, null, x[2])); });
+  }
+  function read() { st.to = $("#f_to").value.trim(); st.from = $("#f_from").value.trim(); st.msg = $("#f_msg").value.trim(); st.pw = $("#f_pw").value.trim(); st.unlock = $("#f_unlock").value; var g = document.querySelector('input[name=gl]:checked'); if (g) st.glang = g.value; }
+  function payload() { return { to: st.to, from: st.from, msg: st.msg, photo: st.photo, music: st.music, voice: st.voice, style: st.style, theme: st.theme }; }
+  function unlockMs() { return st.unlock ? new Date(st.unlock).getTime() || 0 : 0; }
+  function previewD() {
+    var p = payload(); if (!p.msg) p.msg = (PH[st.glang][st.o] || PH[st.glang].other)[0]; if (!p.to) p.to = "…";
+    var ab = AB[st.theme] || AB.gold; return { L: st.glang, a: ab[0], b: ab[1], P: p };
+  }
+  function show(n) {
+    st.step = n;
+    ["p1", "p2", "p3", "p4"].forEach(function (id, i) { $("#" + id).hidden = i + 1 !== n; });
+    [].forEach.call($("#prog").children, function (li, i) { li.className = i + 1 === n ? "on" : i + 1 < n ? "done" : ""; });
+    $("#back").style.visibility = n === 1 ? "hidden" : "visible"; $("#next").hidden = n === 4; $("#pvb").hidden = n === 4; $("#err").textContent = "";
+    if (n === 4) gift($("#pv4"), previewD(), { preview: true });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  $("#next").onclick = function () {
+    if (st.step === 2) { read(); if (!st.to || !st.msg) { $("#err").textContent = t("c_e_msg"); return; } }
+    if (st.step === 3) read();
+    show(st.step + 1);
+  };
+  $("#back").onclick = function () { read(); show(Math.max(1, st.step - 1)); };
+  $("#pvb").onclick = function () { read(); $("#ov").hidden = false; gift($("#ovp"), previewD(), { preview: true }); };
+  $("#ovx").onclick = function () { $("#ov").hidden = true; if ($("#ovp")._gxStop) $("#ovp")._gxStop(); $("#ovp").textContent = ""; };
+  $("#sug").onclick = function () { var l = PH[HK.lang][st.o] || PH[HK.lang].other; sc[st.o] = ((sc[st.o] === undefined ? -1 : sc[st.o]) + 1) % l.length; $("#f_msg").value = l[sc[st.o]]; };
+
+  function compress(f, cb, bad) {
+    var im = new Image(), u = URL.createObjectURL(f);
+    im.onload = function () { var s = Math.min(1, 800 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); cb(c.toDataURL("image/jpeg", 0.8)); };
+    im.onerror = bad; im.src = u;
+  }
+  $("#f_photo").onchange = function () { var f = this.files[0]; if (!f) { st.photo = ""; return; } compress(f, function (d) { st.photo = d; }, function () { st.photo = ""; $("#err").textContent = t("c_e_file"); }); };
+  $("#f_music").onchange = function () {
+    var f = this.files[0]; if (!f) { st.music = ""; return; }
+    if (f.size > 10 * 1024 * 1024) { this.value = ""; st.music = ""; $("#err").textContent = t("c_e_big"); return; }
+    var r = new FileReader(); r.onload = function () { st.music = r.result; }; r.readAsDataURL(f);
+  };
+  $("#rec").onclick = async function () {
+    if (mr && mr.state === "recording") { mr.stop(); return; }
+    try {
+      var s = await navigator.mediaDevices.getUserMedia({ audio: true }); mr = new MediaRecorder(s); chunks = [];
+      mr.ondataavailable = function (e) { chunks.push(e.data); };
+      mr.onstop = function () {
+        s.getTracks().forEach(function (x) { x.stop(); });
+        var bl = new Blob(chunks, { type: mr.mimeType }); $("#rec").textContent = t("c_rec");
+        if (bl.size > 3 * 1024 * 1024) { $("#err").textContent = t("c_e_big"); return; }
+        var r = new FileReader(); r.onload = function () { st.voice = r.result; $("#recst").textContent = t("c_rec_ok"); }; r.readAsDataURL(bl);
+      };
+      mr.start(); $("#rec").textContent = t("c_stop"); setTimeout(function () { if (mr && mr.state === "recording") mr.stop(); }, 60000);
+    } catch (e) { $("#err").textContent = t("c_e_mic"); }
+  };
+
+  async function enc(obj, p) {
+    var salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    var km = await crypto.subtle.importKey("raw", new TextEncoder().encode(p), "PBKDF2", false, ["deriveKey"]);
+    var k = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: 150000, hash: "SHA-256" }, km, { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+    var ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, k, new TextEncoder().encode(JSON.stringify(obj))));
+    var all = new Uint8Array(28 + ct.length); all.set(salt, 0); all.set(iv, 16); all.set(ct, 28);
+    var s = "", ch = 32768; for (var i = 0; i < all.length; i += ch) s += String.fromCharCode.apply(null, all.subarray(i, i + ch));
+    return btoa(s);
+  }
+  async function makeD(requirePw) {
+    read(); var ab = AB[st.theme] || AB.gold, D = { L: st.glang, a: ab[0], b: ab[1], U: unlockMs() };
+    if (st.pw) D.E = await enc(payload(), st.pw); else if (!requirePw) D.P = payload();
+    return D;
+  }
+  var CORE_CSS = document.getElementById("hk-core-css").textContent;
+  function fileHTML(D) {
+    var dir = D.L === "ar" ? "rtl" : "ltr", name = D.L === "ar" ? "هدية لك" : "A gift for you";
+    return '<!DOCTYPE html><html lang="' + D.L + '" dir="' + dir + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + name + '</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Inter:wght@400;500&family=Playfair+Display:wght@700&family=Tajawal:wght@400;500;700&display=swap"><style>html,body{margin:0;min-height:100%;background:#0e0c09}' + CORE_CSS + '</style></head><body><div id="gx"></div><scr' + 'ipt>var hkGift=(' + hkMakeGift.toString() + ')();var D=' + JSON.stringify(D).replace(/</g, "\\u003c") + ';hkGift(document.getElementById("gx"),D,{});</scr' + 'ipt></body></html>';
+  }
+  $("#mkfile").onclick = async function () {
+    var b = this; b.disabled = true; $("#err4").textContent = "";
+    try {
+      var D = await makeD(false), a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([fileHTML(D)], { type: "text/html" })); a.download = "gift.html"; document.body.appendChild(a); a.click(); a.remove();
+      $("#err4").className = "ok"; $("#err4").textContent = t("c_ok_file");
+    } catch (e) { $("#err4").className = "err"; $("#err4").textContent = t("c_e_file"); }
+    b.disabled = false;
+  };
+  $("#mklink").onclick = async function () {
+    var b = this; read(); $("#err4").className = "err"; $("#err4").textContent = "";
+    if (st.pw.length < 6) { $("#err4").textContent = t("c_e_pw6"); return; }
+    b.disabled = true; $("#err4").textContent = t("c_creating");
+    try {
+      var D = await makeD(true);
+      var r = await fetch("/api/gifts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ E: D.E, a: D.a, b: D.b, U: D.U, l: D.L }) });
+      if (r.status === 413) throw new Error("big"); if (r.status === 429) throw new Error("rate"); if (!r.ok) throw new Error("fail");
+      var j = await r.json(), link = location.origin + "/g/" + j.id, box = $("#res"); box.hidden = false; box.textContent = "";
+      var h = document.createElement("b"); h.textContent = t("c_ok_link"); box.appendChild(h);
+      var a = document.createElement("a"); a.className = "l"; a.href = link; a.textContent = link; a.target = "_blank"; a.rel = "noopener"; box.appendChild(a);
+      var row = document.createElement("div"); row.className = "row"; box.appendChild(row);
+      var cp = document.createElement("button"); cp.type = "button"; cp.className = "btn o"; cp.textContent = t("c_copy"); cp.onclick = function () { try { navigator.clipboard.writeText(link); cp.textContent = t("c_copied"); } catch (e) {} }; row.appendChild(cp);
+      var wa = document.createElement("a"); wa.className = "btn o"; wa.target = "_blank"; wa.rel = "noopener"; wa.textContent = t("c_wa"); wa.href = "https://wa.me/?text=" + encodeURIComponent(t("c_wa_text") + "\n" + link + "\n" + t("c_wa_pw")); row.appendChild(wa);
+      var qr = document.createElement("a"); qr.className = "btn o"; qr.textContent = t("c_qr"); qr.href = "/studio#qr"; qr.onclick = function () { try { localStorage.setItem("hk_qr", link); } catch (e) {} }; row.appendChild(qr);
+      var n = document.createElement("p"); n.className = "mu"; n.textContent = t("c_note_pw"); box.appendChild(n);
+      $("#err4").textContent = "";
+    } catch (e) { $("#err4").textContent = e.message === "big" ? t("c_e_big") : e.message === "rate" ? t("c_e_rate") : t("c_e_link"); }
+    b.disabled = false;
+  };
+
+  document.querySelector('input[name=gl][value=' + st.glang + ']').checked = true;
+  document.addEventListener("hk:lang", function (e) { renderChoices(); if (st.step === 4) { read(); gift($("#pv4"), previewD(), { preview: true }); } });
+  renderChoices(); show(1);
+  window.HKC = { enc: enc, fileHTML: fileHTML, makeD: makeD, st: st };
+})();
+</script>
+</body>
+</html>

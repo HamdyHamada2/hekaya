@@ -115,14 +115,14 @@ section{scroll-margin-top:72px}
 .hide{display:none!important}
 [hidden]{display:none!important}
 /* ===== luxury black & gold override ===== */
-html:root:root:root{--bg:#0b0a08;--bg2:#15130f;--tx:#f5efe0;--mu:#b3a88f;--rose:#d4af37;--gold:#f0d98a;--ln:#2e2a1f;color-scheme:dark;padding-top:0;padding-bottom:0}
-body{background:radial-gradient(1100px 560px at 85% -8%,#1f1808 0%,transparent 60%),var(--bg);color:var(--tx)}
+html:root:root:root{--bg:#14120f;--bg2:#1c1914;--tx:#ece5d6;--mu:#a79d88;--rose:#c8a45c;--gold:#e2cb8f;--ln:#3a3428;color-scheme:dark;padding-top:0;padding-bottom:0}
+body{background:radial-gradient(1100px 560px at 85% -8%,#241d10 0%,transparent 60%),var(--bg);color:var(--tx)}
 h1,h2,h3{font-family:Amiri,"Playfair Display",serif}
 .bar,.w>nav,body::before{display:none!important}
 body>footer{display:none}
-.btn{color:#1a1408;background:linear-gradient(135deg,#f6e6a6,#d4af37 55%,#a8832a);box-shadow:0 6px 22px rgba(212,175,55,.18)}
-.btn.o{background:none;color:var(--gold);border:1.5px solid #4a4020;box-shadow:none}
-.seal{color:#1a1408}
+.btn{color:#1d1810;background:linear-gradient(135deg,#e8d49a,#c8a45c 55%,#9c7d3e);box-shadow:0 6px 22px rgba(200,164,92,.18)}
+.btn.o{background:none;color:var(--gold);border:1.5px solid #4a4130;box-shadow:none}
+.seal{color:#1d1810}
 .paper{background-color:var(--bg2)}
 .hearts span{color:var(--rose)}
 .err{color:#ff8a80}
@@ -721,7 +721,7 @@ g("a_go").onclick=function(){
   location.hash="order";
 };
 // QR
-g("q_t").value=location.href.split("#")[0];
+g("q_t").value=location.href.split("#")[0];try{var lq=localStorage.getItem("hk_qr");if(lq){g("q_t").value=lq;localStorage.removeItem("hk_qr")}}catch(e){}
 g("q_b").onclick=function(){
   var t=V("q_t");if(!t){g("q_e").textContent="اكتب الرابط أولًا.";return}
   if(!window.qrcode){g("q_e").textContent="مكتبة QR غير متاحة، تأكد من الاتصال بالإنترنت.";return}

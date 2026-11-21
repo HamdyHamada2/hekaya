@@ -2,77 +2,215 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>هدية لك</title>
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#14110d">
+<title>🎁</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Inter:wght@400;500&family=Playfair+Display:wght@700&family=Tajawal:wght@400;500;700&display=swap">
 <style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#d63a62,#5b1a3a);color:#fff;font:500 19px/1.9 Tahoma,sans-serif;text-align:center}
-.c{max-width:520px;width:100%}
-h1{font:700 30px Georgia,serif;margin:0 0 12px}
-img{max-width:100%;border-radius:20px;margin:14px 0}
-input,button{font:inherit;padding:12px 20px;border-radius:999px;border:0;margin:6px;max-width:100%}
-button{background:#fff;color:#222;font-weight:700;cursor:pointer}
-audio{width:100%;margin:10px 0}
-#mu{position:fixed;top:12px;left:12px;z-index:2}
-#m{white-space:pre-wrap}
-#e{color:#ffd6dd;min-height:1.8em}
-.h{position:fixed;bottom:-30px;animation:u linear infinite;opacity:.4;pointer-events:none}
-@keyframes u{to{transform:translateY(-110vh)}}
-@media(prefers-reduced-motion:reduce){.h{display:none}}
+html,body{margin:0;min-height:100%;background:#0e0c09}
+.gx{position:relative;min-height:100%;display:grid;place-items:center;padding:24px;text-align:center;overflow:hidden;color:#ece4d3;background:radial-gradient(900px 520px at 50% 0%,var(--ga,#2a2113),var(--gb,#0e0c09));font:500 18px/1.8 Tajawal,Inter,system-ui,sans-serif}
+.gx *{box-sizing:border-box}
+.gx-in{position:relative;z-index:1;width:100%;max-width:460px}
+.gx h2{margin:0 0 10px;font:700 30px/1.35 Amiri,"Playfair Display",Georgia,serif;color:var(--ac,#c9a45c)}
+.gx p{margin:0 0 12px;color:#bdb39c}
+.gx-ico{font-size:46px;margin-bottom:6px}
+.gx-count{margin-top:10px;font:700 20px Inter,Tajawal,sans-serif;color:var(--ac,#c9a45c);direction:ltr;word-spacing:2px}
+.gx-inp{display:block;width:100%;margin:12px 0 8px;padding:13px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.28);color:#ece4d3;font:inherit;text-align:center}
+.gx-btn{display:inline-block;margin:6px;padding:11px 28px;border:0;border-radius:999px;cursor:pointer;font:700 16px Tajawal,Inter,sans-serif;color:#1a1408;background:linear-gradient(135deg,#e9d6a0,#c9a45c 55%,#a98a46)}
+.gx-btn:disabled{opacity:.55}
+.gx-sm{padding:7px 18px;font-size:14px}
+.gx-err{min-height:1.7em;color:#ff9a90}
+.gx-tip{margin-top:6px;color:var(--ac,#c9a45c);font-weight:700;animation:gxp 1.6s ease-in-out infinite}
+@keyframes gxp{50%{opacity:.45}}
+.gx button:focus-visible,.gx input:focus-visible{outline:3px solid #e9d6a0;outline-offset:3px}
+.gx-box,.gx-env{display:block;margin:0 auto;border:0;background:none;padding:0;cursor:pointer;color:inherit}
+.gx-box{width:min(78vw,300px);height:min(78vw,300px)}
+.gx-box svg{width:100%;height:100%;overflow:visible}
+.gx-box .gx-l,.gx-box .gx-bw,.gx-box .gx-c{transform-box:fill-box;transition:transform 1s cubic-bezier(.3,.8,.3,1)}
+.gx-box .gx-l{transform-origin:0% 100%}
+.gx-box .gx-bw{transform-origin:50% 100%}
+.gx-box:not(.open){animation:gxb 2.4s ease-in-out infinite}
+@keyframes gxb{50%{transform:translateY(-6px)}}
+.gx-box.open .gx-l{transform:translate(-14px,-34px) rotate(-26deg)}
+.gx-box.open .gx-bw{transform:translate(-30px,-46px) rotate(-26deg)}
+.gx-c{transform:translateY(86px)}
+.gx-box.open .gx-c{transform:translateY(-6px);transition-delay:.35s}
+.gx-env{position:relative;width:min(80vw,290px);height:min(54vw,196px)}
+.gx-eb,.gx-ef,.gx-ep,.gx-el{position:absolute}
+.gx-eb{inset:0;background:#b8943f;border-radius:8px}
+.gx-el{left:10%;right:10%;top:8%;height:80%;background:#ece4d3;border-radius:6px;padding:14% 12% 0;transition:transform 1s ease .35s;z-index:2}
+.gx-el i{display:block;height:5px;margin-bottom:9px;border-radius:3px;background:#c9bb94}
+.gx-ef{inset:0;z-index:3;border-radius:8px;background:linear-gradient(135deg,transparent 49.5%,#a98a46 50%) left/50% 100% no-repeat,linear-gradient(225deg,transparent 49.5%,#a98a46 50%) right/50% 100% no-repeat,linear-gradient(to top,#c9a45c 0,#c9a45c 100%) bottom/100% 55% no-repeat}
+.gx-ep{left:0;right:0;top:0;height:58%;z-index:4;background:#d9c07f;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .6s ease,z-index 0s .3s;border-radius:8px 8px 0 0}
+.gx-env:not(.open){animation:gxb 2.4s ease-in-out infinite}
+.gx-env.open .gx-ep{transform:rotateX(180deg);z-index:1}
+.gx-env.open .gx-el{transform:translateY(-62%)}
+.gx-scr{position:relative;width:min(80vw,300px);aspect-ratio:3/2;margin:0 auto 10px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14)}
+.gx-under{position:absolute;inset:0;display:grid;place-content:center;background:rgba(0,0,0,.3)}
+.gx-cv{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;transition:opacity .6s}
+.gx-cv.gone{opacity:0;pointer-events:none}
+.gx-card{animation:gxin .7s ease both}
+@keyframes gxin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.gx-ph{display:block;max-width:100%;max-height:340px;margin:10px auto;border-radius:18px}
+.gx-au{width:100%;margin:10px 0}
+.gx-msg{white-space:pre-wrap;font-size:20px;line-height:1.9;margin:8px 0}
+.gx-from{margin-top:10px;color:var(--ac,#c9a45c);font-weight:700}
+.gx-mu{position:absolute;top:12px;inset-inline-start:12px;z-index:3;width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.35);color:#e9d6a0;font-size:16px;cursor:pointer}
+.gx-h{position:absolute;bottom:-30px;z-index:0;color:var(--ac,#c9a45c);opacity:.35;pointer-events:none;animation:gxu linear infinite}
+@keyframes gxu{to{transform:translateY(-110vh)}}
+@media(prefers-reduced-motion:reduce){.gx-tip,.gx-box:not(.open),.gx-env:not(.open),.gx-h{animation:none}.gx-card{animation:none}.gx-box .gx-l,.gx-box .gx-bw,.gx-box .gx-c,.gx-el,.gx-ep{transition:none}}
 </style>
 </head>
 <body>
-<button id="mu" hidden aria-label="موسيقى">🎵</button>
-<div class="c">
-  <div id="ld"><h1>💌</h1><p>جاري تحميل هديتك…</p></div>
-  <div id="nf" hidden><h1>الهدية مش موجودة</h1><p>الرابط غلط أو الهدية انتهت مدتها.</p></div>
-  <div id="cd" hidden><h1>⏳ الهدية لسه مقفولة</h1><p>بتتفتح يوم <span id="cl"></span></p><p id="ct" role="timer"></p></div>
-  <div id="g" hidden><h1>🔒 هدية خاصة</h1><p>اكتب كلمة السر اللي وصلتلك</p><input id="p" type="password" autocomplete="off"><br><button id="b">افتح</button><p id="e" role="status"></p></div>
-  <div id="r" hidden><h1 id="t"></h1><img id="i" hidden alt=""><audio id="v" controls hidden></audio><div id="m"></div></div>
-</div>
+<div id="gx"></div>
 <script>
-var $=function(i){return document.getElementById(i)},D=null,busy=false;
-var id=location.pathname.split("/").pop();
-function ub(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
-async function dec(p){
-  var u=ub(D.E),km=await crypto.subtle.importKey("raw",new TextEncoder().encode(p),"PBKDF2",false,["deriveKey"]);
-  var k=await crypto.subtle.deriveKey({name:"PBKDF2",salt:u.slice(0,16),iterations:150000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["decrypt"]);
-  var pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:u.slice(16,28)},k,u.slice(28));
-  return JSON.parse(new TextDecoder().decode(pt));
-}
-function show(d){
-  $("g").hidden=true;$("r").hidden=false;$("t").textContent=d.title;
-  if(d.photo&&/^data:image\//.test(d.photo)){$("i").src=d.photo;$("i").hidden=false}
-  if(d.voice&&/^data:audio\//.test(d.voice)){$("v").src=d.voice;$("v").hidden=false}
-  if(d.music&&/^data:audio\//.test(d.music)){
-    var au=new Audio(d.music),mu=$("mu");au.loop=true;mu.hidden=false;
-    mu.onclick=function(){if(au.paused){au.play();mu.textContent="⏸"}else{au.pause();mu.textContent="🎵"}};
-    au.play().then(function(){mu.textContent="⏸"}).catch(function(){});
+function hkMakeGift() {
+  var STR = {
+    ar: { open: "اضغط لفتح الهدية", env: "اضغط لفتح الرسالة", scr: "امسح بإصبعك لتكشف الهدية", skip: "أظهر مباشرة", pwT: "هدية خاصة", pwH: "اكتب كلمة السر اللي وصلتلك", pwB: "افتح", pwBad: "كلمة السر غير صحيحة", lock: "الهدية لسه مقفولة", opens: "بتتفتح يوم", to: "إلى ", fr: "من ", replay: "إعادة التشغيل", d: "يوم", h: "ساعة", m: "دقيقة", s: "ثانية", mus: "موسيقى" },
+    en: { open: "Tap to open your gift", env: "Tap to open the letter", scr: "Scratch with your finger to reveal", skip: "Reveal now", pwT: "A private gift", pwH: "Enter the password you were sent", pwB: "Open", pwBad: "Wrong password", lock: "This gift is still locked", opens: "It opens on", to: "For ", fr: "From ", replay: "Replay", d: "d", h: "h", m: "m", s: "s", mus: "Music" }
+  };
+  var TH = {
+    gold: { a: "#2a2113", b: "#0e0c09", c: "#c9a45c" },
+    rose: { a: "#3a1424", b: "#150810", c: "#e0a3b5" },
+    night: { a: "#14213a", b: "#080c16", c: "#9fb7e6" },
+    garden: { a: "#123326", b: "#08140e", c: "#9fd4b2" }
+  };
+  var IMG = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
+  var AUD = /^data:audio\/[a-z0-9.+-]+(;codecs=[^;,]+)?;base64,[A-Za-z0-9+\/=]+$/i;
+  var BOX = '<svg viewBox="0 0 300 300" aria-hidden="true"><defs><linearGradient id="gxa" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9d6a0"/><stop offset=".55" stop-color="#c9a45c"/><stop offset="1" stop-color="#86692a"/></linearGradient><linearGradient id="gxb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9c07f"/><stop offset="1" stop-color="#a98a46"/></linearGradient></defs><ellipse cx="150" cy="268" rx="96" ry="10" fill="#000" opacity=".4"/><g class="gx-c"><rect x="82" y="92" width="136" height="104" rx="8" fill="#ece4d3"/><path d="M150 150c-12-9-20-15-20-23a10 10 0 0 1 20-3 10 10 0 0 1 20 3c0 8-8 14-20 23z" fill="#c9a45c"/></g><rect x="62" y="160" width="176" height="104" rx="8" fill="url(#gxb)"/><rect x="140" y="160" width="20" height="104" fill="#14110d" opacity=".22"/><g class="gx-l"><rect x="52" y="132" width="196" height="34" rx="7" fill="url(#gxa)"/><rect x="140" y="132" width="20" height="34" fill="#14110d" opacity=".2"/></g><g class="gx-bw"><ellipse cx="128" cy="124" rx="20" ry="11" fill="url(#gxa)" transform="rotate(-18 128 124)"/><ellipse cx="172" cy="124" rx="20" ry="11" fill="url(#gxa)" transform="rotate(18 172 124)"/><circle cx="150" cy="126" r="8" fill="#a98a46"/></g></svg>';
+  var ENV = '<div class="gx-eb"></div><div class="gx-el"><i></i><i></i><i></i></div><div class="gx-ef"></div><div class="gx-ep"></div>';
+  function el(t, c, h) { var e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; }
+  function tx(t, c, s) { var e = el(t, c); e.textContent = s; return e; }
+  function ub(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  async function dec(E, p) {
+    var u = ub(E), km = await crypto.subtle.importKey("raw", new TextEncoder().encode(p), "PBKDF2", false, ["deriveKey"]);
+    var k = await crypto.subtle.deriveKey({ name: "PBKDF2", salt: u.slice(0, 16), iterations: 150000, hash: "SHA-256" }, km, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    var pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: u.slice(16, 28) }, k, u.slice(28));
+    return JSON.parse(new TextDecoder().decode(pt));
   }
-  var k=0,m=$("m"),iv=setInterval(function(){k+=2;m.textContent=d.msg.slice(0,k);if(k>=d.msg.length)clearInterval(iv)},40);
-  for(var j=0;j<12;j++){var s=document.createElement("span");s.className="h";s.textContent="♥";s.style.left=Math.random()*100+"%";s.style.fontSize=14+Math.random()*20+"px";s.style.animationDuration=8+Math.random()*8+"s";s.style.animationDelay=-Math.random()*10+"s";document.body.appendChild(s)}
+  function gift(root, D, o) {
+    if (root._gxStop) root._gxStop();
+    o = o || {};
+    var L = D.L === "en" ? "en" : "ar", S = STR[L], stops = [], mu = null;
+    root._gxStop = function () { stops.forEach(function (f) { try { f(); } catch (e) {} }); stops = []; root._gxStop = null; };
+    root.className = "gx"; root.setAttribute("dir", L === "ar" ? "rtl" : "ltr"); root.setAttribute("lang", L);
+    root.style.setProperty("--ga", D.a || TH.gold.a); root.style.setProperty("--gb", D.b || TH.gold.b); root.style.setProperty("--ac", TH.gold.c);
+    root.textContent = "";
+    var inner = el("div", "gx-in"); root.appendChild(inner);
+    function screen() { inner.textContent = ""; for (var i = 0; i < arguments.length; i++) inner.appendChild(arguments[i]); }
+    function every(fn, ms) { var id = setInterval(fn, ms); stops.push(function () { clearInterval(id); }); return id; }
+    function later(fn, ms) { var id = setTimeout(fn, ms); stops.push(function () { clearTimeout(id); }); return id; }
+    function head(d) { var n = String(d.to || "").trim(); return n ? S.to + n : String(d.title || ""); }
+    function hearts() {
+      for (var j = 0; j < 12; j++) {
+        var s = el("span", "gx-h", "♥");
+        s.style.left = Math.random() * 100 + "%"; s.style.fontSize = 14 + Math.random() * 20 + "px";
+        s.style.animationDuration = 8 + Math.random() * 8 + "s"; s.style.animationDelay = -Math.random() * 10 + "s";
+        root.appendChild(s);
+      }
+    }
+    function type(m, t) {
+      var red = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion:reduce)").matches;
+      if (red || !t) { m.textContent = t; return; }
+      var k = 0, id = every(function () { k += 2; m.textContent = t.slice(0, k); if (k >= t.length) clearInterval(id); }, 38);
+    }
+    function music(d) {
+      if (o.preview || mu || !d.music || !AUD.test(d.music)) return;
+      var au = new Audio(d.music); au.loop = true; mu = au; stops.push(function () { au.pause(); });
+      var b = tx("button", "gx-mu", "♪"); b.type = "button"; b.setAttribute("aria-label", S.mus);
+      b.addEventListener("click", function () { if (au.paused) { au.play(); b.textContent = "❚❚"; } else { au.pause(); b.textContent = "♪"; } });
+      root.appendChild(b);
+      var pr = au.play(); if (pr && pr.then) pr.then(function () { b.textContent = "❚❚"; }).catch(function () {});
+    }
+    function reveal(d) {
+      var card = el("div", "gx-card"), m = el("div", "gx-msg");
+      card.appendChild(tx("h2", "", head(d)));
+      if (d.photo && IMG.test(d.photo)) { var im = el("img", "gx-ph"); im.src = d.photo; im.alt = ""; card.appendChild(im); }
+      if (d.voice && AUD.test(d.voice)) { var a = el("audio", "gx-au"); a.controls = true; a.src = d.voice; card.appendChild(a); }
+      card.appendChild(m);
+      if (d.from) card.appendChild(tx("div", "gx-from", S.fr + d.from));
+      if (o.preview) { var rp = tx("button", "gx-btn gx-sm", S.replay); rp.type = "button"; rp.addEventListener("click", function () { gift(root, D, o); }); card.appendChild(rp); }
+      screen(card); type(m, String(d.msg || "")); hearts();
+    }
+    function introBox(d) {
+      var w = el("button", "gx-box", BOX); w.type = "button"; w.setAttribute("aria-label", S.open);
+      var tip = tx("div", "gx-tip", S.open); screen(w, tip);
+      w.addEventListener("click", function () { if (w.classList.contains("open")) return; w.classList.add("open"); tip.textContent = ""; music(d); later(function () { reveal(d); }, 1900); });
+    }
+    function introEnv(d) {
+      var w = el("button", "gx-env", ENV); w.type = "button"; w.setAttribute("aria-label", S.env);
+      var tip = tx("div", "gx-tip", S.env); screen(w, tip);
+      w.addEventListener("click", function () { if (w.classList.contains("open")) return; w.classList.add("open"); tip.textContent = ""; music(d); later(function () { reveal(d); }, 1700); });
+    }
+    function introScratch(d) {
+      var wrap = el("div", "gx-scr"), under = el("div", "gx-under"), cv = el("canvas", "gx-cv"), W = 300, H = 200;
+      under.appendChild(tx("div", "gx-ico", "🎁")); under.appendChild(tx("h2", "", head(d)));
+      cv.width = W; cv.height = H; wrap.appendChild(under); wrap.appendChild(cv);
+      var skip = tx("button", "gx-btn gx-sm", S.skip); skip.type = "button";
+      screen(wrap, skip);
+      var ctx = cv.getContext("2d"), g = ctx.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, "#e9d6a0"); g.addColorStop(0.5, "#b8943f"); g.addColorStop(1, "#d9c07f");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(20,14,4,.55)"; ctx.font = "700 18px Tajawal,Inter,sans-serif"; ctx.textAlign = "center"; ctx.fillText(S.scr, W / 2, H / 2 + 6);
+      cv.style.touchAction = "none";
+      var down = false, n = 0, done = false;
+      function finish() { if (done) return; done = true; cv.classList.add("gone"); later(function () { reveal(d); }, 650); }
+      function pos(e) { var r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * W / (r.width || W), (e.clientY - r.top) * H / (r.height || H)]; }
+      function check() { var a = ctx.getImageData(0, 0, W, H).data, c = 0, t = 0; for (var i = 3; i < a.length; i += 64) { t++; if (a[i] === 0) c++; } if (c / t > 0.4) finish(); }
+      function scratch(e) { if (!down || done) return; var p = pos(e); ctx.globalCompositeOperation = "destination-out"; ctx.beginPath(); ctx.arc(p[0], p[1], 20, 0, 7); ctx.fill(); if (++n % 6 === 0) check(); }
+      cv.addEventListener("pointerdown", function (e) { down = true; music(d); scratch(e); });
+      cv.addEventListener("pointermove", scratch);
+      cv.addEventListener("pointerup", function () { down = false; });
+      cv.addEventListener("pointercancel", function () { down = false; });
+      skip.addEventListener("click", function () { music(d); finish(); });
+    }
+    function begin(d) {
+      var th = TH[d.theme] || TH.gold;
+      root.style.setProperty("--ga", th.a); root.style.setProperty("--gb", th.b); root.style.setProperty("--ac", th.c);
+      if (d.style === "box") introBox(d); else if (d.style === "envelope") introEnv(d); else if (d.style === "scratch") introScratch(d); else { music(d); reveal(d); }
+    }
+    function capsule() {
+      var cd = tx("div", "gx-count", ""), id;
+      screen(tx("div", "gx-ico", "⏳"), tx("h2", "", S.lock), tx("p", "", S.opens + " " + new Date(D.U).toLocaleString(L === "ar" ? "ar-EG" : "en-GB", { dateStyle: "full", timeStyle: "short" })), cd);
+      function tick() { var s = Math.floor((D.U - Date.now()) / 1000); if (s <= 0) { clearInterval(id); after(); return; } cd.textContent = Math.floor(s / 86400) + " " + S.d + "  " + Math.floor(s % 86400 / 3600) + " " + S.h + "  " + Math.floor(s % 3600 / 60) + " " + S.m + "  " + (s % 60) + " " + S.s; }
+      tick(); id = every(tick, 1000);
+    }
+    function gate() {
+      var input = el("input", "gx-inp"); input.type = "password"; input.autocomplete = "off"; input.placeholder = "••••••"; input.setAttribute("aria-label", S.pwH);
+      var btn = tx("button", "gx-btn", S.pwB); btn.type = "button";
+      var msg = tx("div", "gx-err", ""); msg.setAttribute("role", "status"); var busy = false;
+      async function go() {
+        if (busy) return; var pw = input.value.trim(); if (!pw) return; busy = true; msg.textContent = ""; btn.disabled = true;
+        var d = null; try { d = await dec(D.E, pw); } catch (e) {}
+        if (!d) { msg.textContent = S.pwBad; btn.disabled = false; busy = false; return; }
+        begin(d);
+      }
+      btn.addEventListener("click", go); input.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+      screen(tx("div", "gx-ico", "🔒"), tx("h2", "", S.pwT), tx("p", "", S.pwH), input, btn, msg);
+      later(function () { try { input.focus(); } catch (e) {} }, 50);
+    }
+    function after() { if (D.E) gate(); else begin(D.P || {}); }
+    if (D.U && Date.now() < D.U && !o.preview) capsule(); else after();
+  }
+  gift.dec = dec;
+  return gift;
 }
-function ask(){$("cd").hidden=true;$("g").hidden=false;$("p").focus()}
-async function open(){
-  if(busy)return;var p=$("p").value.trim();if(!p)return;busy=true;$("e").textContent="";
-  try{show(await dec(p))}catch(e){$("e").textContent="كلمة السر غير صحيحة"}
-  busy=false;
-}
-$("b").onclick=open;$("p").onkeydown=function(e){if(e.key==="Enter")open()};
-(async function(){
-  try{
-    var r=await fetch("/api/gifts/"+encodeURIComponent(id));
-    $("ld").hidden=true;
-    if(!r.ok){$("nf").hidden=false;return}
-    D=await r.json();
-    if(/^#[0-9a-f]{6}$/i.test(D.a)&&/^#[0-9a-f]{6}$/i.test(D.b))document.body.style.background="linear-gradient(135deg,"+D.a+","+D.b+")";
-    if(D.U&&Date.now()<D.U){
-      $("cd").hidden=false;$("cl").textContent=new Date(D.U).toLocaleString("ar-EG",{dateStyle:"full",timeStyle:"short"});
-      var iv;function tick(){var s=Math.floor((D.U-Date.now())/1000);if(s<=0){clearInterval(iv);ask();return}$("ct").textContent=Math.floor(s/86400)+" يوم "+Math.floor(s%86400/3600)+" ساعة "+Math.floor(s%3600/60)+" دقيقة "+(s%60)+" ثانية"}
-      tick();iv=setInterval(tick,1000);
-    }else ask();
-  }catch(e){$("ld").hidden=true;$("nf").hidden=false}
+(async function () {
+  var root = document.getElementById("gx"), id = location.pathname.split("/").pop();
+  try {
+    var r = await fetch("/api/gifts/" + encodeURIComponent(id));
+    if (!r.ok) throw new Error("nf");
+    var D = await r.json();
+    hkMakeGift()(root, { L: D.l === "en" ? "en" : "ar", E: D.E, U: D.U, a: D.a, b: D.b }, {});
+  } catch (e) {
+    root.className = "gx";
+    var c = document.createElement("div"); c.className = "gx-in";
+    var h = document.createElement("h2"); h.textContent = "الهدية مش موجودة · Gift not found";
+    var p = document.createElement("p"); p.textContent = "الرابط غلط أو الهدية انتهت مدتها. · The link is wrong or the gift has expired.";
+    c.append(h, p); root.appendChild(c);
+  }
 })();
 </script>
 </body>

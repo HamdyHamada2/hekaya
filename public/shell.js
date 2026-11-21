@@ -3,7 +3,7 @@
   if (window.HK) return;
   const D = {
     ar: {
-      nav_home: "الرئيسية", nav_studio: "اصنع هديتك", nav_quiz: "تعرفني قد إيه؟", nav_offers: "العروض", nav_store: "المتجر", nav_account: "حسابي", nav_admin: "الإدارة",
+      nav_home: "الرئيسية", nav_studio: "اصنع هديتك", nav_quiz: "تعرفني قد إيه؟", nav_tools: "الأدوات", nav_offers: "العروض", nav_store: "المتجر", nav_account: "حسابي", nav_admin: "الإدارة",
       lang_btn: "English", foot_tag: "اصنع لحظة، مش رسالة.", foot_priv: "الهدايا تتصنع وتتشفّر داخل جهازك، وكلمة السر ما بتتبعتش لأي سيرفر.", foot_rights: "جميع الحقوق محفوظة",
       meta_title: "حكاية حب | هدايا رقمية فاخرة", meta_desc: "اصنع هدية رقمية مشفّرة بكلمة سر: رسالتك وصورك وصوتك وموسيقاك في رابط واحد تتفتح بلحظة سينمائية.",
       h_kicker: "هدايا رقمية فاخرة", h_title: "اصنع لحظة، مش رسالة",
@@ -31,7 +31,7 @@
       cta_t: "جاهز تصنع لحظتك؟", cta_d: "ابدأ دلوقتي، ومش هتاخد دقايق.", cta_btn: "اصنع هديتك",
     },
     en: {
-      nav_home: "Home", nav_studio: "Create a gift", nav_quiz: "How well do you know me?", nav_offers: "Offers", nav_store: "Store", nav_account: "Account", nav_admin: "Admin",
+      nav_home: "Home", nav_studio: "Create a gift", nav_quiz: "How well do you know me?", nav_tools: "Tools", nav_offers: "Offers", nav_store: "Store", nav_account: "Account", nav_admin: "Admin",
       lang_btn: "عربي", foot_tag: "Create a moment, not a message.", foot_priv: "Gifts are built and encrypted on your device. Your password is never sent to any server.", foot_rights: "All rights reserved",
       meta_title: "Hekaya Hob | Luxury digital gifts", meta_desc: "Create an encrypted, password-protected digital gift: your words, photos, voice and music in one link that opens like a movie moment.",
       h_kicker: "Luxury digital gifts", h_title: "Create a moment, not a message",
@@ -70,12 +70,12 @@
     bag: "M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0",
     user: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
   };
-  const LINKS = [["/", "nav_home", "home"], ["/studio", "nav_studio", "gift"], ["/wheel", "nav_offers", "star"], ["/store", "nav_store", "bag"], ["/account", "nav_account", "user"]];
+  const LINKS = [["/", "nav_home", "home"], ["/create", "nav_studio", "gift"], ["/wheel", "nav_offers", "star"], ["/store", "nav_store", "bag"], ["/account", "nav_account", "user"]];
   const path = location.pathname.replace(/\/+$/, "") || "/";
   const isOn = (href) => (href === "/account" ? path === "/account" || path === "/admin" : href === "/" ? path === "/" || path === "/index.html" : path === href);
   const svg = (d) => '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>';
-  const LOGO = '<svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="hkg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e6a6"/><stop offset="1" stop-color="#a8832a"/></linearGradient></defs><path d="M16 28S4 20.5 4 12.2A6.2 6.2 0 0 1 16 9.6a6.2 6.2 0 0 1 12 2.6C28 20.5 16 28 16 28z" fill="url(#hkg)"/><path d="M11 13h10M16 9.6V20" stroke="#0b0a08" stroke-width="1.6" stroke-linecap="round"/></svg>';
-  let top, tabs, foot, admin = false;
+  const LOGO = '<svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="hkg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8d49a"/><stop offset="1" stop-color="#9c7d3e"/></linearGradient></defs><path d="M16 28S4 20.5 4 12.2A6.2 6.2 0 0 1 16 9.6a6.2 6.2 0 0 1 12 2.6C28 20.5 16 28 16 28z" fill="url(#hkg)"/><path d="M9.6 11.6c.7-2.1 2.5-3.1 4.3-2.6" stroke="#fff" stroke-opacity=".4" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>';
+  let top, tabs, foot, admin = false, inited = false;
 
   function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 
@@ -86,7 +86,7 @@
       l.href = "https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&family=Tajawal:wght@400;500;700&display=swap";
       head.appendChild(l);
     }
-    if (!document.querySelector('meta[name="theme-color"]')) { const m = el("meta"); m.name = "theme-color"; m.content = "#0b0a08"; head.appendChild(m); }
+    if (!document.querySelector('meta[name="theme-color"]')) { const m = el("meta"); m.name = "theme-color"; m.content = "#14120f"; head.appendChild(m); }
     top = el("header", "hk-top"); tabs = el("nav", "hk-tabs"); foot = el("footer", "hk-footer");
     tabs.setAttribute("aria-label", "Main");
     const ph = document.getElementById("hdr");
@@ -97,15 +97,15 @@
   function render() {
     const ld = dirOf(lang);
     [top, tabs, foot].forEach((e) => { e.setAttribute("dir", ld); e.setAttribute("lang", lang); });
-    const nav = LINKS.concat([["/quiz", "nav_quiz", "star"]]).filter((x) => x[0] !== "/account" || true);
-    const order = ["/", "/studio", "/quiz", "/wheel", "/store", "/account"];
+    const nav = LINKS.concat([["/quiz", "nav_quiz", "star"], ["/studio", "nav_tools", "star"]]);
+    const order = ["/", "/create", "/studio", "/quiz", "/wheel", "/store", "/account"];
     const sorted = order.map((h) => nav.find((x) => x[0] === h));
     top.innerHTML = '<div class="hk-in"><a class="hk-logo" href="/">' + LOGO + '<span>' + (lang === "ar" ? "حكاية حب" : "Hekaya Hob") + '</span></a>' +
       '<nav class="hk-nav" aria-label="Main">' + sorted.map((x) => '<a href="' + x[0] + '"' + (isOn(x[0]) ? ' class="on" aria-current="page"' : "") + ">" + t(x[1]) + "</a>").join("") + (admin ? '<a href="/admin"' + (path === "/admin" ? ' class="on"' : "") + ">" + t("nav_admin") + "</a>" : "") + "</nav>" +
       '<button class="hk-lang" type="button" id="hk-lang">' + t("lang_btn") + "</button></div>";
     tabs.innerHTML = LINKS.map((x) => '<a href="' + x[0] + '"' + (isOn(x[0]) ? ' class="on" aria-current="page"' : "") + ">" + svg(IC[x[2]]) + "<span>" + t(x[1]) + "</span></a>").join("");
     foot.innerHTML = '<div class="hk-fin"><div class="hk-logo" style="font-size:20px">' + LOGO + "<span>" + (lang === "ar" ? "حكاية حب" : "Hekaya Hob") + "</span></div><div>" + t("foot_tag") + "</div>" +
-      '<div class="hk-flinks"><a href="/studio">' + t("nav_studio") + '</a><a href="/store">' + t("nav_store") + '</a><a href="/quiz">' + t("nav_quiz") + '</a><a href="/wheel">' + t("nav_offers") + '</a><a href="/account">' + t("nav_account") + "</a></div>" +
+      '<div class="hk-flinks"><a href="/create">' + t("nav_studio") + '</a><a href="/studio">' + t("nav_tools") + '</a><a href="/store">' + t("nav_store") + '</a><a href="/quiz">' + t("nav_quiz") + '</a><a href="/wheel">' + t("nav_offers") + '</a><a href="/account">' + t("nav_account") + "</a></div>" +
       "<div>" + t("foot_priv") + "</div><div dir=\"ltr\">© 2026 " + (lang === "ar" ? "حكاية حب" : "Hekaya Hob") + " — " + t("foot_rights") + " · Eng: Hamdy Hamada</div></div>";
     document.getElementById("hk-lang").onclick = () => HK.setLang(lang === "ar" ? "en" : "ar");
   }
@@ -128,9 +128,10 @@
       lang = l; try { localStorage.setItem("hk_lang", l); } catch (e) {}
       render(); apply(); document.dispatchEvent(new CustomEvent("hk:lang", { detail: l }));
     },
+    add(d) { Object.assign(D.ar, d.ar || {}); Object.assign(D.en, d.en || {}); if (inited) { render(); apply(); } },
     setUser(u) { const a = !!(u && u.role === "admin"); if (a !== admin) { admin = a; render(); } },
   };
 
-  function init() { build(); render(); apply(); }
+  function init() { build(); render(); apply(); inited = true; }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
